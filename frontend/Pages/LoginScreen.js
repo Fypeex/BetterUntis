@@ -1,5 +1,14 @@
 import React from 'react';
-import {AsyncStorage,TouchableOpacity ,TextInput, Button, StyleSheet, Text, View } from 'react-native';
+import {
+    AsyncStorage,
+    TouchableOpacity,
+    TextInput,
+    Button,
+    StyleSheet,
+    Text,
+    View,
+    ActivityIndicator
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import validate from "react-native-web/dist/exports/StyleSheet/validate";
 const ss = require("../backend/modules/schoolSearch.js")
@@ -7,9 +16,9 @@ const ss = require("../backend/modules/schoolSearch.js")
 class LoginScreen extends React.Component {
     constructor(props){
         super(props);
-        this.state={
+        this.state = {
             data:[]
-        };
+        }
     }
     async componentDidMount() {
         let data = [];
@@ -17,7 +26,6 @@ class LoginScreen extends React.Component {
         if (value !== null) {
             data.push(
                 <View style={styles.container} key={0}>
-                    <View style={styles.header}/>
                     <View style={styles.infobox}>
                         <Text>{value.displayName}</Text>
                         <Text>{value.address}</Text>
@@ -30,18 +38,13 @@ class LoginScreen extends React.Component {
                 </View>
             )
         }
-        this.setState( {data:data})
-        console.log(value)
+        this.setState({data})
     }
     render(){
        return (
-           <View>
-            {
-                this.state.data.map((value, index) => {
-                    return value
-                })
-            }
-           </View>
+           this.state.data.map((key,value) => {
+               return key
+           })
        )
     }
 }
@@ -49,6 +52,12 @@ class LoginScreen extends React.Component {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
+    backArrow: {
+        padding:20,
+        backgroundColor:"green",
+        marginTop:40,
+        marginLeft:20,
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',

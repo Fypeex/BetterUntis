@@ -1,56 +1,63 @@
 import React from 'react';
-import {AsyncStorage ,TouchableOpacity ,TextInput, Button, StyleSheet, Text, View } from 'react-native';
+import {
+    AsyncStorage,
+    TouchableOpacity,
+    TextInput,
+    Button,
+    StyleSheet,
+    Text,
+    View,
+    ActivityIndicator
+} from 'react-native';
 import {useCardAnimation} from "@react-navigation/stack";
 import {ScrollView} from "react-native-web";
 import { Ionicons } from '@expo/vector-icons';
 const ss = require("../backend/modules/schoolSearch.js")
 
 class SchoolSearch extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            textInput : [],
+            textInput: [],
         }
     }
+        addTextInput = async (key, text) => {
+            try {
+                let textInput = []
 
-    addTextInput = async (key,text) => {
-        try {
-            let textInput = []
-
-            let a = await ss.searchSchool(text).then(res => {
-                return res.data
-            }).catch(e => {
-                console.log(e)
-            })
-            if(a.error || a.result.schools.length > 5) {
-                textInput.push(
-                    <View style={styles.schoolContainer} key={key}>
-                        <Text style={styles.searchError}>Too many results, please be more specific</Text>
-                    </View>,
-                );
-            }
-            else if (a.result.schools.length < 5) {
-                a.result.schools.forEach(school => {
-                    key = key + 1
-                    textInput.push(
-                        <TouchableOpacity  style={styles.schoolContainer} key={key} onPress={async (event) => {
-
-                            await AsyncStorage.setItem("School", JSON.stringify(school));
-
-                            this.props.navigation.navigate('LoginScreen')
-                        }}>
-                            <Text style={styles.schoolContainerTop}>{school.displayName}</Text>
-                            <Text style={styles.schoolContainerBottom}>{school.address}</Text>
-                        </TouchableOpacity >
-                    );
+                let a = await ss.searchSchool(text).then(res => {
+                    return res.data
+                }).catch(e => {
+                    console.log(e)
                 })
+                if (a.error || a.result.schools.length > 5) {
+                    textInput.push(
+                        <View style={styles.schoolContainer} key={key}>
+                            <Text style={styles.searchError}>Too many results, please be more specific</Text>
+                        </View>,
+                    );
+                } else if (a.result.schools.length < 5) {
+                    a.result.schools.forEach(school => {
+                        key = key + 1
+                        textInput.push(
+                            <TouchableOpacity style={styles.schoolContainer} key={key} onPress={async (event) => {
+
+                                await AsyncStorage.setItem("School", JSON.stringify(school));
+
+                                this.props.navigation.navigate('LoginScreen')
+                            }}>
+                                <Text style={styles.schoolContainerTop}>{school.displayName}</Text>
+                                <Text style={styles.schoolContainerBottom}>{school.address}</Text>
+                            </TouchableOpacity>
+                        );
+                    })
+                }
+                this.setState(textInput)
+            } catch (e) {
+                console.log(e)
             }
-            this.setState({textInput})
         }
-        catch (e) {
-            console.log(e)
-        }
-    }
+    
     render(){
         return(
             <View style={styles.container}>

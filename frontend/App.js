@@ -3,10 +3,9 @@ import React from 'react';
 import {Button, StyleSheet, View, Text, AsyncStorage} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import SchoolSearch from './Pages/SchoolSearch.js';
+import SchoolSearch from './Pages/SchoolSearch';
 import LoginScreen from "./Pages/LoginScreen";
-import Loading from "./Pages/LoadingScreen"
-
+import LoadingScreen from "./Pages/LoadingScreen"
 const Stack = createStackNavigator();
 
 class App extends React.Component {
@@ -15,9 +14,9 @@ class App extends React.Component {
                 <NavigationContainer>
                     <Stack.Navigator>
                         <Stack.Screen
-                            name="Loading"
+                            name="LoadingScreen"
                             options={{headerShown: false}}
-                            component={Loading}
+                            component={LoadingScreen}
                         />
                         <Stack.Screen
                             name="SchoolSearch"
