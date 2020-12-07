@@ -12,7 +12,8 @@ import {
 import {useCardAnimation} from "@react-navigation/stack";
 import {ScrollView} from "react-native-web";
 import { Ionicons } from '@expo/vector-icons';
-const ss = require("../backend/modules/schoolSearch.js")
+const ss = require("../backend/modules/schoolSearch")
+const l = require("../backend/modules/accountHandling")
 
 class SchoolSearch extends React.Component {
     constructor(props) {
@@ -21,43 +22,69 @@ class SchoolSearch extends React.Component {
             textInput: [],
         }
     }
-        addTextInput = async (key, text) => {
-            try {
-                let textInput = []
+    addTextInput = async (key, text) => {
+        try {
+            let textInput = []
 
-                let a = await ss.searchSchool(text).then(res => {
-                    return res.data
-                }).catch(e => {
-                    console.log(e)
-                })
-                if (a.error || a.result.schools.length > 5) {
+            let a = await ss.searchSchool(text).then(res => {
+                return res.data
+            }).catch(e => {
+            })
+            if (a.error || a.result.schools.length > 5) {
+                textInput.push(
+                    <View style={styles.schoolContainer} key={key}>
+                        <Text style={styles.searchError}>Too many results, please be more specific</Text>
+                    </View>,
+                );
+            } else if (a.result.schools.length < 5) {
+                a.result.schools.forEach(school => {
+                    key = key + 1
                     textInput.push(
-                        <View style={styles.schoolContainer} key={key}>
-                            <Text style={styles.searchError}>Too many results, please be more specific</Text>
-                        </View>,
-                    );
-                } else if (a.result.schools.length < 5) {
-                    a.result.schools.forEach(school => {
-                        key = key + 1
-                        textInput.push(
-                            <TouchableOpacity style={styles.schoolContainer} key={key} onPress={async (event) => {
-
-                                await AsyncStorage.setItem("School", JSON.stringify(school));
-
+                        <TouchableOpacity style={styles.schoolContainer} key={key} onPress={async (event) => {
+                            await AsyncStorage.setItem("School", JSON.stringify(school));
+                            let sessions = JSON.parse(await AsyncStorage.getItem('sessions'))
+                            let sessionFound = false
+                            let updated = false
+                            if(sessions !== undefined && sessions !== null){
+                                sessions.forEach(session => {
+                                    if (session[0] === school.schoolId) {
+                                        sessionFound = true;
+                                    }
+                                })
+                            }else {
+                                sessions = []
+                            }
+                            let cookies = await l.getCookies(school.serverUrl)
+                            if (cookies !== null) {
+                                sessions.forEach(session => {
+                                    if(session[0] === school.schoolId) session[1] = cookies
+                                    updated = true;
+                                })
+                                if(!updated) sessions.push([school.schoolId, cookies])
+                                await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
                                 this.props.navigation.navigate('LoginScreen')
-                            }}>
-                                <Text style={styles.schoolContainerTop}>{school.displayName}</Text>
-                                <Text style={styles.schoolContainerBottom}>{school.address}</Text>
-                            </TouchableOpacity>
-                        );
-                    })
-                }
-                this.setState(textInput)
-            } catch (e) {
-                console.log(e)
+                                } else if (sessionFound) {
+                                    await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
+                                    this.props.navigation.navigate('LoginScreen')
+                                } else {
+                                    alert("couldnt create session")
+                                }
+
+
+                        }}>
+                            <Text style={styles.schoolContainerTop}>{school.displayName}</Text>
+                            <Text style={styles.schoolContainerBottom}>{school.address}</Text>
+                        </TouchableOpacity>
+                    );
+                })
             }
+            this.setState({textInput})
+        } catch (e) {
+            console.log(e)
         }
-    
+    }
+
+
     render(){
         return(
             <View style={styles.container}>

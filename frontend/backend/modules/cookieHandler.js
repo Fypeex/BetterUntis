@@ -3,17 +3,11 @@
 /*                                                            */
 /*                                                            */
 exports.getValueInCookies = function getValueInCookies(s, cookies) {
+        if(cookies === undefined) return null
+        let js = cookies.split("JSESSIONID")[1].split(";")[0].replace("=","")
+        let name = cookies.split('schoolname="')[1].split('"')[0]
 
-    cookies = cookies.filter(i => i.includes(s))
-        .toString()
-        .split(";")
-
-        .filter(i => i.includes(s))
-        .toString()
-
-    return cookies.split(s)[1]
-        .replace(/"/g, "")
-        .substr(1)
+    return [js,name]
 }
 /*                                                             */
 /*                                                             */

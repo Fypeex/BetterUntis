@@ -36,7 +36,6 @@ class LoadingScreen extends React.Component {
         );
 
     }
-
     render(){
         return (
             <View key = {0} style={styles.container}>
