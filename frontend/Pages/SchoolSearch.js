@@ -12,6 +12,7 @@ import {
 import {useCardAnimation} from "@react-navigation/stack";
 import {ScrollView} from "react-native-web";
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from "expo-linear-gradient";
 const ss = require("../backend/modules/schoolSearch")
 const l = require("../backend/modules/accountHandling")
 
@@ -88,9 +89,14 @@ class SchoolSearch extends React.Component {
     render(){
         return(
             <View style={styles.container}>
+                <LinearGradient 
+                    colors={["rgb(50,50,50)", "rgb(20,20,20)"]}
+                    start={[-0.66,0]}
+                    style={styles.gradient}>
+                
                 <View style = {styles.header}></View>
                 <View style={styles.button}>
-                    <TextInput style={styles.input} placeholder='Search for your school' onChangeText={(text) => {
+                    <TextInput style={styles.input}placeholderTextColor = "rgb(150,150,150)" placeholder='Search for your school' onChangeText={(text) => {
                         this.addTextInput(this.state.textInput.length,text)
                     }
                     }
@@ -102,6 +108,7 @@ class SchoolSearch extends React.Component {
                         return value
                     })
                 }
+                </LinearGradient>
             </View>
         )
     }
@@ -109,10 +116,22 @@ class SchoolSearch extends React.Component {
 
 export default SchoolSearch;
 
+const styleVars = {
+    backroundColor: "rgb(20,20,20)",
+    secondaryColor: "rgb(60,60,60)",
+    thirdColor: "rgb(75,75,75)",
+    whiteColor:  "rgb(226, 226, 226)",
+    accentColor: "rgb(225,63,85)",
+}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        //backgroundColor: styleVars.backroundColor,
+    },
+    gradient:{
+        width: '100%',
+        height: '100%',
     },
     button: {
         padding:8,
@@ -129,19 +148,21 @@ const styles = StyleSheet.create({
         shadowRadius: 16.00,
         elevation: 10,
         minHeight:50,
-        backgroundColor:"lightgray",
-        borderBottomWidth:2,
-        borderColor:"#0030db",
+        backgroundColor: styleVars.secondaryColor,
+        borderRadius:3,
     },
     input:{
         fontSize:20,
+        color: styleVars.whiteColor,
+        
     },
     searchError: {
         textAlign:"center",
         padding:3,
         maxHeight: 200,
         fontSize:15,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        color: styleVars.whiteColor,
     },
     schoolContainer: {
         maxHeight:200,
@@ -149,26 +170,36 @@ const styles = StyleSheet.create({
         marginRight: 20,
     },
     schoolContainerTop: {
-        borderTopWidth:1,
+        borderTopLeftRadius:3,
+        borderTopRightRadius:3,
+        marginTop: 2,
         padding:3,
         maxHeight: 200,
-        backgroundColor:"#91cfff",
+        backgroundColor:styleVars.thirdColor,
         fontSize:20,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        color: styleVars.whiteColor,
+
     },
     schoolContainerBottom: {
+        borderBottomLeftRadius:3,
+        borderBottomRightRadius:3,
         padding:3,
         maxHeight:170,
-        backgroundColor: "#cfeaff",
+        backgroundColor: styleVars.secondaryColor,
         fontSize:14,
+        color: styleVars.whiteColor,
     },
     header: {
         height:80,
-        backgroundColor:"#0030db",
+
+        backgroundColor: styleVars.secondaryColor,
     },
     icon: {
         position: 'absolute',
         right: 10,
         padding:8,
+        color:"#fff",
+
     }
 });
