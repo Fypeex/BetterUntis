@@ -11,7 +11,6 @@ const fetch2 = require("node-fetch")
 exports.getCookies = async function getCookies(url) {
         let method = "GET";
         url = url.split("?")[0]+"/?"+url.split("?")[1]
-    console.log(url)
         return await fetch(url, {
             method: method
         }).then(r => {
@@ -45,9 +44,9 @@ exports.getCookies = async function getCookies(url) {
         console.log(token)
         console.log(cookies)
 
-        let traceId = await fetch2(url, {
+        return await fetch2(url, {
             "headers": {
-                "cookies":cookies,
+                "cookies": cookies,
                 "accept": "application/json",
                 "accept-language": "en,en-US;q=0.9,de-DE;q=0.8,de;q=0.7",
                 "content-type": "application/x-www-form-urlencoded",
@@ -63,9 +62,8 @@ exports.getCookies = async function getCookies(url) {
             "mode": "cors",
             "credentials": "include"
         }).then(r => {
-            return r.json()
+            return r.json();
         })
-        return traceId
     }
     /*                                                                            */
     /*                                                                            */

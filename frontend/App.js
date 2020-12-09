@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import SchoolSearch from './Pages/SchoolSearch';
 import LoginScreen from "./Pages/LoginScreen";
 import LoadingScreen from "./Pages/LoadingScreen"
+import Main from "./Pages/Main"
 const Stack = createStackNavigator();
 
 class App extends React.Component {
@@ -28,6 +29,11 @@ class App extends React.Component {
                             options={{headerShown: false}}
                             component={LoginScreen}
                         />
+                        <Stack.Screen
+                            name="Main"
+                            options={{headerShown: false}}
+                            component={Main}
+                            />
                     </Stack.Navigator>
                 </NavigationContainer>
             );

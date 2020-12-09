@@ -27,7 +27,6 @@ class LoginScreen extends React.Component {
         let data = [];
         const value = JSON.parse(await AsyncStorage.getItem('School'));
         const sessions = JSON.parse(await AsyncStorage.getItem('sessions'))
-        console.log(sessions)
         if (value !== null) {
             data.push([
                 <View key={0}><Text style={styles.infoTop} >{value.displayName}</Text></View>,
@@ -60,10 +59,11 @@ class LoginScreen extends React.Component {
         if(this.state.username !== "" && this.state.password !== "") {
             let url = value.serverUrl.split("?")[0] + "/j_spring_security_check"
             console.log(url)
-            l.login(url,value,cookies[0],cookies[1],cookies[3],this.state.username,this.state.password).then(r => {
+            l.login(url,value,cookies[0],cookies[1],cookies[3],this.state.username,this.state.password).then(async r => {
                 switch(r.state) {
                     case "SUCCESS":
-                        alert("Login success")
+                        await AsyncStorage.setItem("login",JSON.stringify([this.state.username,this.state.password]));
+                        this.props.navigation.navigate("Main")
                         break;
                     case "LOGIN_ERROR":
                         valid = invalidIn

@@ -56,11 +56,7 @@ class SchoolSearch extends React.Component {
                                 sessions = []
                             }
                             let cookies = await l.getCookies(school.serverUrl)
-                            console.log(school.schoolId)
-                            console.log(cookies)
-                            console.log(sessions)
-                            console.log(sessionFound)
-                            if (cookies!= null && cookies[0] != undefined) {
+                            if (cookies!= null && cookies[0] !== undefined) {
                                 if(sessionFound) {
                                     sessions.forEach(session => {
                                         if (session[0] === school.schoolId) session[1] = cookies
