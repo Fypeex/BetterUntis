@@ -3,15 +3,12 @@ import {
     AsyncStorage,
     TouchableOpacity,
     TextInput,
-    Button,
     StyleSheet,
     Text,
     View,
-    ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
-import validate from "react-native-web/dist/exports/StyleSheet/validate";
 const l = require("../backend/modules/accountHandling")
 
 class LoginScreen extends React.Component {
@@ -40,7 +37,7 @@ class LoginScreen extends React.Component {
         this.setState({data})
     }
     login = async (key) => {
-        let cookies;
+        let cookies = [undefined]
         const value = JSON.parse(await AsyncStorage.getItem('School'));
         const sessions = JSON.parse(await AsyncStorage.getItem('sessions'));
 
@@ -48,7 +45,7 @@ class LoginScreen extends React.Component {
             if(session[0] === value.schoolId) cookies = session[1]
         })
 
-        if(cookies === undefined) {
+        if(cookies[0] === undefined) {
             alert("Session not found")
             this.props.navigation.navigate("SchoolSearch")
         }
@@ -57,11 +54,6 @@ class LoginScreen extends React.Component {
         let invalidIn = [
             <View style={styles.invalidIn} key={key}>
                 <Text style={styles.invalidText}>Invalid username or password!</Text>
-            </View>
-        ]
-        let validIn = [
-            <View key={key}>
-                <Text>Logging in</Text>
             </View>
         ]
 
@@ -105,16 +97,16 @@ class LoginScreen extends React.Component {
                     </View>
                     <View style={styles.infobox}>
                         {
-                        this.state.data.map((key,value) => {
+                        this.state.data.map((key) => {
                             return key
                         })
                         }
                     </View>
                     <View style={styles.loginContainer}>
-                        <TextInput style={styles.username}placeholderTextColor = "rgb(150,150,150)" placeholder = "Username" onChangeText = {(text) => this.setState({username: text})}/>
-                        <TextInput style={styles.password}placeholderTextColor = "rgb(150,150,150)" placeholder = "Password" onChangeText = {(password) => this.setState({password: password})}/>
+                        <TextInput style={styles.username} placeholderTextColor = "rgb(150,150,150)" placeholder = "Username" onChangeText = {(text) => this.setState({username: text})}/>
+                        <TextInput style={styles.password} placeholderTextColor = "rgb(150,150,150)" placeholder = "Password" onChangeText = {(password) => this.setState({password: password})}/>
                         {
-                        this.state.valid.map((value, key) => {
+                        this.state.valid.map((value) => {
                             return value
                         })
                     }
@@ -124,7 +116,7 @@ class LoginScreen extends React.Component {
                         start={[1,0]}
                         style={styles.buttonGradient}>
                         <TouchableOpacity styles={styles.loginButton} onPress = {(key) => {
-                            this.login(key)
+                            this.login(key).catch(e => console.log(e))
                         }}>
                             <Text style={styles.loginButton}>Login</Text>
                         </TouchableOpacity>
