@@ -29,6 +29,8 @@ class LoginScreen extends React.Component {
         //AsyncStorage.clear()
         let data = [];
         const value = JSON.parse(await AsyncStorage.getItem('School'));
+        const sessions = JSON.parse(await AsyncStorage.getItem('sessions'))
+        console.log(sessions)
         if (value !== null) {
             data.push([
                 <View key={0}><Text style={styles.infoTop} >{value.displayName}</Text></View>,
@@ -38,7 +40,18 @@ class LoginScreen extends React.Component {
         this.setState({data})
     }
     login = async (key) => {
+        let cookies;
         const value = JSON.parse(await AsyncStorage.getItem('School'));
+        const sessions = JSON.parse(await AsyncStorage.getItem('sessions'));
+
+        sessions.forEach(session => {
+            if(session[0] === value.schoolId) cookies = session[1]
+        })
+
+        if(cookies === undefined) {
+            alert("Session not found")
+            this.props.navigation.navigate("SchoolSearch")
+        }
 
         let valid = [];
         let invalidIn = [
@@ -53,9 +66,18 @@ class LoginScreen extends React.Component {
         ]
 
         if(this.state.username !== "" && this.state.password !== "") {
-            let url = value.serverUrl.split("?")[0] + " j_spring_security_check"
-            let school = value.loginName
-            valid = validIn
+            let url = value.serverUrl.split("?")[0] + "/j_spring_security_check"
+            console.log(url)
+            l.login(url,value,cookies[0],cookies[1],cookies[3],this.state.username,this.state.password).then(r => {
+                switch(r.state) {
+                    case "SUCCESS":
+                        alert("Login success")
+                        break;
+                    case "LOGIN_ERROR":
+                        valid = invalidIn
+                        break;
+                }
+            })
         }
         else {
             valid = invalidIn
@@ -73,7 +95,9 @@ class LoginScreen extends React.Component {
                         style={styles.gradient}>
                     
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={() => {
+                        <TouchableOpacity onPress={async () => {
+                            await AsyncStorage.removeItem("School")
+                            console.log(await AsyncStorage.getAllKeys())
                             this.props.navigation.navigate("SchoolSearch")
                         }}>
                             <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>

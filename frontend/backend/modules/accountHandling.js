@@ -1,6 +1,7 @@
 const fetches = require("./fetches.js");
 const cookieHandler = require("./cookieHandler.js");
-const fetch = require("node-fetch")
+const fetch = require("axios")
+const fetch2 = require("node-fetch")
 
 //Dont touch this
 //Init all variables needed to login/fetch the timetables and other data
@@ -9,13 +10,23 @@ const fetch = require("node-fetch")
 /*                                                                               */
 exports.getCookies = async function getCookies(url) {
         let method = "GET";
-
+        url = url.split("?")[0]+"/?"+url.split("?")[1]
+    console.log(url)
         return await fetch(url, {
             method: method
-        }).then(async r => {
-            return cookieHandler.getValueInCookies("JSESSIONID", r.headers.map["set-cookie"]);
+        }).then(r => {
+            return r
+        }).then(r => {
+            let a = [undefined,undefined,undefined]
+                let b = cookieHandler.getValueInCookies("JSESSIONID", r.headers["set-cookie"]);
+                if(b!==null && b[0] !== undefined) a=b
+                a.push(r.data.toString().split('"')[r.data.toString().split('"').indexOf("csrfToken") +2])
+
+            return a
+            }).catch(e => {
+                console.log(e)
         })
-    }
+        }
     /*                                                                                */
     /*                                                                                */
 ////////////////////////////////////////////////////////////////////////////////////
@@ -25,20 +36,35 @@ exports.getCookies = async function getCookies(url) {
 ////////////////////////////////////////////////////////////////////////////////
 
     /*                                                                            */
-    exports.login = async function (url, school, JID, name) {
-        let URL = url;
+    exports.login = async function (url, value, JID, name,token,username,password) {
+        let school = value.loginName
         let method = "POST";
-        let data = `school=${name}&j_username=${c.username}&j_password="${c.password}&token=`;
-        let cookies = `JSESSIONID=${JID}; schoolname=${school}`
-        console.log(URL)
-        console.log(data)
+        let data = `school=${school}&j_username=${username}&j_password=${password}&token=`;
+        let cookies = `JSESSIONID="${JID}"; schoolname="${name}"`
+
+        console.log(token)
         console.log(cookies)
 
-        let traceId = await fetches.getData(URL, method, data, cookies);
-
-        console.log(traceId)
-
-        traceId = cookieHandler.getValueInCookies("traceId", traceId.headers["set-cookie"]);
+        let traceId = await fetch2(url, {
+            "headers": {
+                "cookies":cookies,
+                "accept": "application/json",
+                "accept-language": "en,en-US;q=0.9,de-DE;q=0.8,de;q=0.7",
+                "content-type": "application/x-www-form-urlencoded",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "x-csrf-token": token
+            },
+            "referrer": url,
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": data,
+            "method": method,
+            "mode": "cors",
+            "credentials": "include"
+        }).then(r => {
+            return r.json()
+        })
         return traceId
     }
     /*                                                                            */

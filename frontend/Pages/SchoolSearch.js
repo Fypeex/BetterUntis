@@ -56,20 +56,26 @@ class SchoolSearch extends React.Component {
                                 sessions = []
                             }
                             let cookies = await l.getCookies(school.serverUrl)
-                            if (cookies !== null) {
-                                sessions.forEach(session => {
-                                    if(session[0] === school.schoolId) session[1] = cookies
-                                    updated = true;
-                                })
-                                if(!updated) sessions.push([school.schoolId, cookies])
+                            console.log(school.schoolId)
+                            console.log(cookies)
+                            console.log(sessions)
+                            console.log(sessionFound)
+                            if (cookies!= null && cookies[0] != undefined) {
+                                if(sessionFound) {
+                                    sessions.forEach(session => {
+                                        if (session[0] === school.schoolId) session[1] = cookies
+                                        updated = true;
+                                    })
+                                }
+                                else sessions.push([school.schoolId, cookies])
                                 await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
                                 this.props.navigation.navigate('LoginScreen')
-                                } else if (sessionFound) {
-                                    await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
-                                    this.props.navigation.navigate('LoginScreen')
-                                } else {
-                                    alert("couldnt create session")
-                                }
+                            } else if (sessionFound) {
+                                await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
+                                this.props.navigation.navigate('LoginScreen')
+                            } else {
+                                alert("Couldn't create session")
+                            }
 
 
                         }}>
