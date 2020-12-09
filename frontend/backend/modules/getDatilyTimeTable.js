@@ -22,7 +22,6 @@ exports.getTimeTable = async function fetchData(url,cookies,school) {
         "mode": "cors",
         "credentials": "include"
     }).then(r => {
-        console.log(JSON.parse(JSON.stringify(r)))
         return r.json()
     }).then(json => {
         console.log(json)

@@ -56,7 +56,9 @@ class SchoolSearch extends React.Component {
                                 sessions = []
                             }
                             let cookies = await l.getCookies(school.serverUrl)
-                            if (cookies!= null && cookies[0] !== undefined) {
+                            cookies.push(Date.now().toString())
+                            console.log(cookies)
+                            if (cookies[0] !== undefined) {
                                 if(sessionFound) {
                                     sessions.forEach(session => {
                                         if (session[0] === school.schoolId) session[1] = cookies
@@ -64,6 +66,12 @@ class SchoolSearch extends React.Component {
                                     })
                                 }
                                 else sessions.push([school.schoolId, cookies])
+
+                                console.log(sessionFound)
+                                console.log(updated)
+                                console.log(sessions)
+                                let v = JSON.parse(await AsyncStorage.getItem("School"))
+                                console.log(v)
                                 await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
                                 this.props.navigation.navigate('LoginScreen')
                             } else if (sessionFound) {
