@@ -1,4 +1,4 @@
-/*const getTT = require("./getDatilyTimeTable.js")
+/*const getTT = require("./getTimeTable.js")
 const fs = require("fs")
 //Date Format: YYYYMMDD (20201130)
 const date = ["20201130"]
@@ -15,7 +15,7 @@ getTT.getTimeTable(date).then(res => {
 
 const ss = require("./schoolSearch.js")
 const aH = require("./accountHandling.js")
-const tt = require("./getDatilyTimeTable.js")
+const tt = require("./getTimeTable.js")
 
 console.log("Fetching schooldata")
 ss.searchSchool("rfgs").then(r => {

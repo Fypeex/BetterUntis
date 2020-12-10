@@ -14,24 +14,34 @@ import validate from "react-native-web/dist/exports/StyleSheet/validate";
 const ss = require("../backend/modules/schoolSearch.js")
 
 class LoadingScreen extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    checkState = async () => {
+        let state = await AsyncStorage.getItem("State")
+
+        switch (state) {
+            case "LOGGED_IN":
+                this.props.navigation.navigate("Main")
+                break;
+            case "SEARCH_SCHOOL":
+                this.props.navigation.navigate("SchoolSearch")
+                break;
+            case "LOGGED_OUT":
+                this.props.navigation.navigate("LoginScreen")
+                break;
+            default:
+                this.props.navigation.navigate("SchoolSearch")
+        }
+    }
 
     async componentDidMount() {
-        const value = JSON.parse(await AsyncStorage.getItem('School'));
-        if (value !== null) {
-            this.props.navigation.navigate('LoginScreen')
-        }
-        else {
-            this.props.navigation.navigate('SchoolSearch')
-        }
+        await this.checkState()
         this.props.navigation.addListener(
             'focus',
-            async () => {
-                if (value !== null) {
-                    this.props.navigation.navigate('LoginScreen')
-                }
-                else {
-                    this.props.navigation.navigate('SchoolSearch')
-                }
+            () => {
+                this.checkState()
             }
         );
 
