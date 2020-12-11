@@ -42,6 +42,7 @@ class LoginScreen extends React.Component {
 
                 if(!r.error) {
                     await AsyncStorage.setItem("Session", JSON.stringify(r.data.result))
+                    await AsyncStorage.setItem("Creds", JSON.stringify({username: this.state.username, password: this.state.password}))
                     await AsyncStorage.setItem("State","LOGGED_IN")
                     this.props.navigation.navigate("Main")
                 }
@@ -59,7 +60,6 @@ class LoginScreen extends React.Component {
                     <View style={styles.header}>
                         <TouchableOpacity onPress={async () => {
                             await AsyncStorage.removeItem("School")
-                            console.log(await AsyncStorage.getAllKeys())
                             this.props.navigation.navigate("SchoolSearch")
                         }}>
                             <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>
@@ -74,7 +74,7 @@ class LoginScreen extends React.Component {
                     </View>
                     <View style={styles.loginContainer}>
                         <TextInput style={styles.username} placeholderTextColor = "rgb(150,150,150)" placeholder = "Username" onChangeText = {(text) => this.setState({username: text})}/>
-                        <TextInput style={styles.password} placeholderTextColor = "rgb(150,150,150)" placeholder = "Password" onChangeText = {(password) => this.setState({password: password})}/>
+                        <TextInput style={styles.password} secureTextEntry={true} placeholderTextColor = "rgb(150,150,150)" placeholder = "Password" onChangeText = {(password) => this.setState({password: password})}/>
                         {
                         this.state.valid.map((value) => {
                             return value
