@@ -25,11 +25,8 @@ class LoginScreen extends React.Component {
             };
         }
     async componentDidMount() {
-        //AsyncStorage.clear()
         let data = [];
         const value = JSON.parse(await AsyncStorage.getItem('School'));
-        const sessions = JSON.parse(await AsyncStorage.getItem('sessions'))
-        console.log(sessions)
         if (value !== null) {
             data.push([
                 <View key={0}><Text style={styles.infoTop} >{value.displayName}</Text></View>,
@@ -39,49 +36,23 @@ class LoginScreen extends React.Component {
         this.setState({data})
     }
     login = async (key) => {
-        let cookies = [undefined]
-        const value = JSON.parse(await AsyncStorage.getItem('School'));
-        const sessions = JSON.parse(await AsyncStorage.getItem('sessions'));
 
-        sessions.forEach(session => {
-            if(session[0] === value.schoolId) cookies = session[1]
-        })
+        if(this.state.username !== "" || this.state.password !== "") {
 
-        if(cookies[0] === undefined) {
-            alert("Session not found")
-            this.props.navigation.navigate("SchoolSearch")
-        }
+            const value = JSON.parse(await AsyncStorage.getItem("School"));
+            l.login(value.serverUrl, this.state.username, this.state.password).then(async r => {
 
-        let valid = [];
-        let invalidIn = [
-            <View style={styles.invalidIn} key={key}>
-                <Text style={styles.invalidText}>Invalid username or password!</Text>
-            </View>
-        ]
-
-        if(this.state.username !== "" && this.state.password !== "") {
-            let url = value.serverUrl.split("?")[0] + "/j_spring_security_check"
-            console.log(url)
-            l.login(url,value,cookies[0],cookies[1],cookies[3],this.state.username,this.state.password).then(r => {
-                switch(r.state) {
-                    case "SUCCESS":
-                        alert("Login success")
-                        break;
-                    case "LOGIN_ERROR":
-                        valid = invalidIn
-                        break;
+                if(!r.error) {
+                    await AsyncStorage.setItem("Session", JSON.stringify(r.data.result))
+                    await AsyncStorage.setItem("Creds", JSON.stringify({username: this.state.username, password: this.state.password}))
+                    await AsyncStorage.setItem("State","LOGGED_IN")
+                    this.props.navigation.navigate("Main")
                 }
             })
         }
-        else {
-            valid = invalidIn
-        }
-        this.setState({valid})
     }
     render(){
        return (
-           
-
                 <View style={styles.container} key={0}>
                     <StatusBar  barStyle="light-content" hidden={true} translucent={true} />
                     <LinearGradient 
@@ -92,7 +63,6 @@ class LoginScreen extends React.Component {
                     <View style={styles.header}>
                         <TouchableOpacity onPress={async () => {
                             await AsyncStorage.removeItem("School")
-                            console.log(await AsyncStorage.getAllKeys())
                             this.props.navigation.navigate("SchoolSearch")
                         }}>
                             <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>
@@ -107,7 +77,7 @@ class LoginScreen extends React.Component {
                     </View>
                     <View style={styles.loginContainer}>
                         <TextInput style={styles.username} placeholderTextColor = "rgb(150,150,150)" placeholder = "Username" onChangeText = {(text) => this.setState({username: text})}/>
-                        <TextInput style={styles.password} placeholderTextColor = "rgb(150,150,150)" placeholder = "Password" onChangeText = {(password) => this.setState({password: password})}/>
+                        <TextInput style={styles.password} secureTextEntry={true} placeholderTextColor = "rgb(150,150,150)" placeholder = "Password" onChangeText = {(password) => this.setState({password: password})}/>
                         {
                         this.state.valid.map((value) => {
                             return value
