@@ -7,12 +7,15 @@ import {
     StyleSheet,
     Text,
     View,
-    ActivityIndicator
+    ActivityIndicator,
+    StatusBar
 } from 'react-native';
 import {useCardAnimation} from "@react-navigation/stack";
 import {ScrollView} from "react-native-web";
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
+import { isLoaded } from 'expo-font';
+import { Font } from 'expo';
 const ss = require("../backend/modules/schoolSearch")
 const l = require("../backend/modules/accountHandling")
 
@@ -22,7 +25,15 @@ class SchoolSearch extends React.Component {
         this.state = {
             textInput: [],
         }
+
     }
+/*
+    componentDidMount() {
+        Font.loadAsync({
+          'Raleway': require('../assets/fonts/Raleway-Light.ttf'),
+        })  
+      }
+*/
     addTextInput = async (key, text) => {
         try {
             let textInput = []
@@ -95,8 +106,9 @@ class SchoolSearch extends React.Component {
     render(){
         return(
             <View style={styles.container}>
+                <StatusBar  barStyle="light-content" hidden={true} translucent={true} />
                 <LinearGradient 
-                    colors={["rgb(50,50,50)", "rgb(20,20,20)"]}
+                    colors={["rgb(60,60,60)", "rgb(15,15,15)"]}
                     start={[-0.66,0]}
                     style={styles.gradient}>
                 
@@ -160,7 +172,7 @@ const styles = StyleSheet.create({
     input:{
         fontSize:20,
         color: styleVars.whiteColor,
-        
+        //fontFamily: "Raleway",
     },
     searchError: {
         textAlign:"center",
@@ -197,7 +209,7 @@ const styles = StyleSheet.create({
         color: styleVars.whiteColor,
     },
     header: {
-        height:80,
+        height:60,
 
         backgroundColor: styleVars.secondaryColor,
     },
@@ -206,6 +218,5 @@ const styles = StyleSheet.create({
         right: 10,
         padding:8,
         color:"#fff",
-
     }
 });

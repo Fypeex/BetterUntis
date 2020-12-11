@@ -9,6 +9,7 @@ import {
     View,
     ActivityIndicator
 } from 'react-native';
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from '@expo/vector-icons';
 import validate from "react-native-web/dist/exports/StyleSheet/validate";
 const ss = require("../backend/modules/schoolSearch.js")
@@ -38,9 +39,15 @@ class LoadingScreen extends React.Component {
     }
     render(){
         return (
-            <View key = {0} style={styles.container}>
-                <ActivityIndicator size="large" color="gray"/>
-            </View>
+
+            <LinearGradient 
+                colors={["rgb(60,60,60)", "rgb(15,15,15)"]}
+                start={[-0.66,0]}
+                style={styles.gradient}>
+                <View key = {0} style={styles.container}>
+                    <ActivityIndicator size="large" color="rgb(200,200,200)"/>
+                </View>
+            </LinearGradient>
         )
     }
 }
@@ -49,7 +56,10 @@ const styles = StyleSheet.create({
         justifyContent:"center",
         alignItems:"center",
         flex: 1,
-        backgroundColor: '#fff',
+    },    
+    gradient:{
+        width: '100%',
+        height: '100%',
     },
 })
 export default LoadingScreen;
