@@ -1,5 +1,7 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View} from "react-native";
+import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
+import {weeklyView} from "./Components/WeeklyView"
+import {dailyView} from "./Components/DailyView"
 import t from "../backend/modules/getTimeTable"
 import l from "../backend/modules/accountHandling"
 
@@ -11,9 +13,10 @@ class Main extends React.Component {
             ],
             days: [
 
+            ],
+            view:[
             ]
         }
-    console.log("Main")
     }
     async getGrid(school,session) {
         return await t.getTimeGrid(school,session).then(r => {return r})
@@ -40,33 +43,7 @@ class Main extends React.Component {
         }
         this.renderTimeGrid(TimeGrid);
 
-        this.renderDays(new Date())
 
-
-    }
-    renderDays(date) {
-        console.log("Rendered time")
-        let diff = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
-        let startingDay = new Date(date.setDate(diff)).getTime()
-
-        let days = [
-            <View key={99} style={styles.topLeft}/>
-        ]
-
-
-        for(let i = 0; i<5;i++) {
-            let s = new Date(startingDay + (i * 3600000 * 24)).toLocaleString().split(",")[0].split("/")
-        let d = s[1]
-            let m = s[0]
-            let y = s[2]
-            days.push(
-                <View key={i} style={styles.date}>
-                    <Text style = {styles.dateText}>{d}/{m}/{y}</Text>
-                </View>
-            )
-
-        }
-        this.setState({days})
     }
     renderTimeGrid(TimeGrid) {
         let data = TimeGrid.data
@@ -117,13 +94,23 @@ class Main extends React.Component {
                             }
                         </View>
                         <View style={styles.smallTTContainer}>
-
+                            {
+                                this.state.view.map((key) => {
+                                    return key
+                                })
+                            }
                         </View>
                 </View>
             </View>
         )
     }
 }
+
+const WeeklView = () => {
+
+}
+
+
 const styleVars = {
     backroundColor: "rgb(20,20,20)",
     secondaryColor: "rgb(60,60,60)",
