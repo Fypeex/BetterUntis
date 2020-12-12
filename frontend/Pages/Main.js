@@ -1,7 +1,8 @@
 import React from "react"
 import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 import {weeklyView} from "./Components/WeeklyView"
-import {dailyView} from "./Components/DailyView"
+import {DailyView} from "./Components/DailyView"
+import {TimeGrid} from "./Components/TimeGrid"
 import t from "../backend/modules/getTimeTable"
 import l from "../backend/modules/accountHandling"
 
@@ -10,104 +11,48 @@ class Main extends React.Component {
         super(props);
         this.state = {
             timeGridLeft: [
+                <TimeGrid key={99}/>
             ],
             days: [
 
             ],
             view:[
+                <DailyView key={98}/>
             ]
-        }
-    }
-    async getGrid(school,session) {
-        return await t.getTimeGrid(school,session).then(r => {return r})
-    }
-    async login(school){
-        let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
-        console.log(creds)
-        if(creds === undefined || creds === null || creds.username === null || creds.password === null || creds.username === undefined || creds.password === undefined) {
-            await AsyncStorage.setItem("Session","LOGGED_OUT")
-            this.props.navigation.navigate("LoginScreen")
-        }
-        else {
-            return l.login(school.serverUrl, creds.username, creds.password);
         }
     }
     async componentDidMount() {
         let school = JSON.parse(await AsyncStorage.getItem("School"))
-        let session = await AsyncStorage.getItem("Session");
+        let session = JSON.parse(await AsyncStorage.getItem("Session"));
         //let TimeTable = await t.getTimeTable(school.serverUrl, session.sessionId, school.loginName)
-        let TimeGrid = await this.getGrid(school,session)
-        if(TimeGrid.error && TimeGrid.error.message === "not authenticated") {
-            session = await this.login(school)
-            TimeGrid = await this.getGrid(school, session)
-        }
-        this.renderTimeGrid(TimeGrid);
 
 
-    }
-    renderTimeGrid(TimeGrid) {
-        let data = TimeGrid.data
-        let rows = data.rows
-        let endTime = 755;
-        let timeGridLeft = []
-        for(let i =0;i<rows.length;i++) {
-            console.log("Pushing")
-            console.log(rows[i].endTime)
-            if(rows[i].startTime === endTime) {
-                timeGridLeft.push(
-                    <View style={styles.timeGridBlock} key={rows[i].period}>
-                        <Text key={0} style={styles.startTime}> {rows[i].startTime}</Text>
-                        <Text key={1} style={styles.periodNumber}> {rows[i].period}.</Text>
-                        <Text key={2} style={styles.endTime}> {rows[i].endTime}</Text>
-                    </View>
-                )
-                endTime = rows[i].endTime
-            }
-            else {
-                timeGridLeft.push(
-                    <View style={styles.breakBlock}/>
-                )
-                i--
-                endTime = rows[i+1].startTime
-            }
-
-        }
-        this.setState({timeGridLeft})
     }
     render() {
         return(
             <View style={styles.container}>
                 <View style={styles.header}/>
-                <View style={styles.TopBar}>
                     {
                         this.state.days.map((key) => {
                             return key
                         })
                     }
-                </View>
                 <View style={styles.ttContainer}>
-                    <View style={styles.LeftBar}>
-                            {
-                                this.state.timeGridLeft.map((key) => {
-                                    return key
-                                })
-                            }
+                    <View style={styles.LeftBar} key={0}>
+                            <TimeGrid/>
                         </View>
-                        <View style={styles.smallTTContainer}>
+                        <View style={styles.smallTTContainer} key={1}>
                             {
                                 this.state.view.map((key) => {
                                     return key
                                 })
                             }
                         </View>
+
                 </View>
             </View>
         )
     }
-}
-
-const WeeklView = () => {
-
 }
 
 
@@ -149,7 +94,6 @@ const styles = StyleSheet.create({
     ttContainer: {
         flexDirection: "row",
         flex:1,
-        backgroundColor:"black",
     },
     smallTTContainer: {
         flexDirection: "row",

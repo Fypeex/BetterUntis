@@ -22,20 +22,13 @@ exports.getTimeTable = async function fetchData(url,cookies,school) {
     })
 }
 exports.getTimeGrid = async function getTimeGrid(school,session) {
-    session = JSON.parse(session)
+    console.log(session)
     const options = {
         headers: {
             cookie: "JSESSIONID=" + session.sessionId
         }
     }
-    return axios.post("https://terpsichore.webuntis.com/WebUntis/jsonrpc.do?school=RFGS-Freiburg",
-        {
-            id:"ID",
-            method:"getTimegridUnits",
-            jsonrpc:"2.0"
-        },
-        options
-        ).then(r => {
+    return axios.get(school.serverUrl.split("?")[0]+"/api/public/timegrid").then(r => {
         return r.data
     }).catch(e => {
         console.log(e)
