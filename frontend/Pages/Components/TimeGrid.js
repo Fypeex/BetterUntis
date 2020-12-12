@@ -22,13 +22,21 @@ export class TimeGrid extends React.Component {
         }
     }
     async getGrid(school,session) {
-        return await t.getTimeGrid(school,session).then(r => {return r})
+        let grid = JSON.parse(await AsyncStorage.getItem("timeGrid"))
+        if(grid === undefined || grid === null) {
+            grid = await t.getTimeGrid(school, session).then(r => {
+                return r
+            })
+        }
+        await AsyncStorage.setItem("timeGrid",JSON.stringify(grid))
+
+        return grid
     }
     renderTimeGrid(TimeGrid) {
         let rows = TimeGrid.data.rows
         let endTime = 755;
         let timeGridLeft = [
-            <View style={styles.timeGridBlock}/>
+            <View style={styles.timeGridBlock} key={65}/>
             ]
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].startTime === endTime) {
@@ -96,7 +104,7 @@ const styles = StyleSheet.create({
         borderWidth:0.3,
     },
     timeGridBlock:{
-        flex:1/13,
+        flex:1,
         borderWidth:0.8,
     },
     startTime:{

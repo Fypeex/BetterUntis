@@ -1,47 +1,142 @@
-import {Text, TouchableOpacity, View, StyleSheet} from "react-native";
-import React from "react";
-
-export class DailyView extends React.Component{
-
+import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-native";
+import React,{Component} from "react";
+import t, {getDayTimeTable} from "../../backend/modules/getTimeTable"
+import PropTypes from 'prop-types';
+import {login} from "../../backend/modules/accountHandling"
+export class DailyView extends Component{
     constructor(props) {
         super(props);
 
+        let startingDay = Date.now()
+        let s = new Date(startingDay).toLocaleString().split(",")[0].split("/")
+        let d = s[1]
+        let m = s[0]
+        let y = s[2]
+        this.date = d+"/"+m+"/"+y
+        this.day = y+m+d
         this.state = {
-            days:[]
+            days:[],
+            lessons:[],
+            lessonsRendered:false
         }
     }
 
     renderDays() {
-        console.log("Rendered time")
-        let startingDay = Date.now()
+        let day = this.props.day
+        let date
+        if(day === undefined) {date = this.date}
+        else{date = day.toString().substr(6,2)+"/"+day.toString().substr(4,2)+"/"+day.toString().substr(0,4)}
+
         let days = []
-
-
-
-
-            let s = new Date(startingDay).toLocaleString().split(",")[0].split("/")
-            let d = s[1]
-            let m = s[0]
-            let y = s[2]
-            days.push(
-                <View style={styles.TopBar}>
-                    <TouchableOpacity key={0} style={styles.date}>
-                        <Text style = {styles.dateText}>{d}/{m}/{y}</Text>
-                    </TouchableOpacity>
-                </View>
-            )
+        days.push(
+            <TouchableOpacity style={styles.date} key={99}>
+                <Text style = {styles.dateText}>{date}</Text>
+            </TouchableOpacity>
+        )
 
         this.setState({days})
+        console.log("Rendered time")
     }
-    componentDidMount() {
-        this.renderDays()
+
+
+    async renderLessons() {
+        if (!this.state.lessonsRendered) {
+            let session = JSON.parse(await AsyncStorage.getItem("Session"));
+            if(session === undefined) {
+                this.props.navigation.navigate("LoginScreen")
+            }
+            let school = JSON.parse(await AsyncStorage.getItem("School"))
+            if(school === undefined) {
+                this.props.navigation.navigate("SchoolSearch")
+            }
+
+
+            let grid = JSON.parse(await AsyncStorage.getItem("timeGrid"))
+            if (grid === undefined || grid === null) {
+                grid = await t.getTimeGrid(school, session).then(r => {
+                    return r
+                })
+            }
+            await AsyncStorage.setItem("timeGrid", JSON.stringify(grid))
+            let day = this.props.day
+            if(day === undefined) day = this.day
+
+            let tt = await getDayTimeTable(day, session, school)
+            let lessons = new Array(grid.data.rows.length)
+            for (let k = 0; k < lessons.length; k++) {
+                lessons[k] = <View style={styles.timeGridBlock} key={(k+1) * 17}>
+                    <Text>{k * 17}</Text>
+                </View>
+            }
+            if(tt !== 400) {
+
+
+                if (tt.data.isSessionTimeout) {
+                    console.log("New Session")
+                    let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
+                    session = await login(school.serverUrl, creds.username, creds.password)
+                    session = session.data.result
+                    tt = await getDayTimeTable(20201210, session, school)
+
+                }
+
+                tt.data.data.dayTimeTable.forEach(lesson => {
+
+                    let h = lesson.timeGridHour.split("-")
+
+                    h.forEach(les => {
+                        console.log(les)
+                        lessons[parseInt(les) - 1] = <View style={styles.timeGridBlock} key={parseInt(les)}>
+                            <View style={styles.lesson}>
+                                <Text key={2}>{parseInt(les)}</Text>
+                                <Text key={0}>{lesson.subject}</Text>
+                                <Text key={1}>{lesson.room}</Text>
+                            </View>
+                        </View>
+                    })
+                })
+            }
+            let rows = grid.data.rows
+                let endTime = 755
+                let s = 0;
+                for (let i = 0; i < rows.length; i++) {
+                    if (rows[i].startTime === endTime) {
+                        endTime = rows[i].endTime
+                    } else {
+
+                        lessons.splice(i + s, 0, <View style={styles.breakBlock}
+                                                       key={s * 20}><Text>{s * 20}</Text></View>)
+                        s++
+                        endTime = rows[i + 1].startTime
+                    }
+                }
+
+                this.setState({lessons})
+                this.state.lessonsRendered = true
+
+        }
+    }
+
+
+    async componentDidMount() {
+        await this.renderDays()
+        await this.renderLessons();
     }
 
     render() {
         return(
-            this.state.days.map((key) => {
-                return key
-            })
+            <View style = {styles.day}>
+                {
+                    this.state.days.map((key) => {
+                        return key
+                    })
+                }
+                {
+                    this.state.lessons.map((key) => {
+                        return key
+                    })
+                }
+            </View>
         )
 
     }
@@ -55,33 +150,19 @@ const styleVars = {
     accentColor: "rgb(225,63,85)",
 }
 const styles = StyleSheet.create({
-    topLeft:{
-        flex:1/6
+    lesson: {
+      margin:5,
+      backgroundColor:"cyan",
+        flex:1,
+    },
+    day: {
+        flex:1,
     },
     buttonGradient:{
         marginTop: 20,
         borderRadius: 90,
     },
-    breakBlock: {
-        height:20,
-        borderWidth:0.3,
-    },
-    timeGridBlock:{
-        flex:1/13,
-        borderWidth:0.8,
-    },
-    startTime:{
-        fontSize: 9,
-        textAlign:"left",
-    },
-    endTime:{
-        fontSize: 9,
-        textAlign:"right",
-    },
-    periodNumber: {
-        textAlign:"center",
-        fontSize:11,
-    },
+
     ttContainer: {
         flexDirection: "row",
         flex:1,
@@ -93,8 +174,8 @@ const styles = StyleSheet.create({
     },
     TopBar: {
         flexDirection:"row",
-        flex:1,
         height:100,
+        flex:1,
     },
     LeftBar: {
         backgroundColor:"gray",
@@ -115,23 +196,28 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         flex:5/6,
     },
-    lesson: {
-        flex:1/5,
-        borderWidth: 1,
-    },
-    text: {
-        fontSize:10,
-    },
+
     header: {
         height:80,
         backgroundColor: styleVars.secondaryColor,
     },
     date:{
-        flex:1/6,
+        backgroundColor:"gray",
         borderWidth:0.3,
+        flex:1,
     },
     dateText: {
         color:"white",
         fontSize:8,
-    }
+    },
+    breakBlock: {
+        backgroundColor:"lightgray",
+        height:20,
+        borderWidth:0.3,
+    },
+    timeGridBlock:{
+        flex:1,
+        backgroundColor:"lightgray",
+        borderWidth:0.8,
+    },
 })
