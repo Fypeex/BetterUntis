@@ -42,6 +42,7 @@ class SchoolSearch extends React.Component {
                 return res.data
             }).catch(e => {
             })
+
             if (a.error || a.result.schools.length > 5) {
                 textInput.push(
                     <View style={styles.schoolContainer} key={key}>
@@ -50,45 +51,13 @@ class SchoolSearch extends React.Component {
                 );
             } else if (a.result.schools.length < 5) {
                 a.result.schools.forEach(school => {
-                    key = key + 1
+                    console.log(school)
+                    key++
                     textInput.push(
                         <TouchableOpacity style={styles.schoolContainer} key={key} onPress={async (event) => {
-                            await AsyncStorage.setItem("School", JSON.stringify(school));
-                            let sessions = JSON.parse(await AsyncStorage.getItem('sessions'))
-                            let sessionFound = false
-                            let updated = false
-                            if(sessions !== undefined && sessions !== null){
-                                sessions.forEach(session => {
-                                    if (session[0] === school.schoolId) {
-                                        sessionFound = true;
-                                    }
-                                })
-                            }else {
-                                sessions = []
-                            }
-                            let cookies = await l.getCookies(school.serverUrl)
-                            console.log(school.schoolId)
-                            console.log(cookies)
-                            console.log(sessions)
-                            console.log(sessionFound)
-                            if (cookies!= null && cookies[0] != undefined) {
-                                if(sessionFound) {
-                                    sessions.forEach(session => {
-                                        if (session[0] === school.schoolId) session[1] = cookies
-                                        updated = true;
-                                    })
-                                }
-                                else sessions.push([school.schoolId, cookies])
-                                await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
-                                this.props.navigation.navigate('LoginScreen')
-                            } else if (sessionFound) {
-                                await AsyncStorage.setItem("sessions", JSON.stringify(sessions));
-                                this.props.navigation.navigate('LoginScreen')
-                            } else {
-                                alert("Couldn't create session")
-                            }
-
-
+                            await AsyncStorage.setItem("School", JSON.stringify(school))
+                            await AsyncStorage.setItem("State","LOGGED_OUT")
+                            this.props.navigation.navigate("LoginScreen")
                         }}>
                             <Text style={styles.schoolContainerTop}>{school.displayName}</Text>
                             <Text style={styles.schoolContainerBottom}>{school.address}</Text>
@@ -114,7 +83,7 @@ class SchoolSearch extends React.Component {
                 
                 <View style = {styles.header}></View>
                 <View style={styles.button}>
-                    <TextInput style={styles.input}placeholderTextColor = "rgb(150,150,150)" placeholder='Search for your school' onChangeText={(text) => {
+                    <TextInput style={styles.input} placeholderTextColor = "rgb(150,150,150)" placeholder='Search for your school' onChangeText={(text) => {
                         this.addTextInput(this.state.textInput.length,text)
                     }
                     }
