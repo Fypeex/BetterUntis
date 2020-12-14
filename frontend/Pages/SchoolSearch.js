@@ -25,7 +25,7 @@ class SchoolSearch extends React.Component {
         this.state = {
             textInput: [],
         }
-
+        AsyncStorage.clear()
     }
 /*
     componentDidMount() {

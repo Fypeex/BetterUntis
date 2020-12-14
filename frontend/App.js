@@ -7,36 +7,47 @@ import SchoolSearch from './Pages/SchoolSearch';
 import LoginScreen from "./Pages/LoginScreen";
 import LoadingScreen from "./Pages/LoadingScreen"
 import Main from "./Pages/Main"
+import {DailyView} from "./Pages/Components/DailyView"
+import {TimeGrid} from "./Pages/Components/TimeGrid";
+
 const Stack = createStackNavigator();
 
 class App extends React.Component {
     render() {
-            return (
-                <NavigationContainer>
-                    <Stack.Navigator>
-                        <Stack.Screen
-                            name="LoadingScreen"
-                            options={{headerShown: false}}
-                            component={LoadingScreen}
-                        />
-                        <Stack.Screen
-                            name="SchoolSearch"
-                            options={{headerShown: false}}
-                            component={SchoolSearch}
-                        />
-                        <Stack.Screen
-                            name="LoginScreen"
-                            options={{headerShown: false}}
-                            component={LoginScreen}
-                        />
-                        <Stack.Screen
-                            name="Main"
-                            options={{headerShown: false}}
-                            component={Main}
-                            />
-                    </Stack.Navigator>
-                </NavigationContainer>
-            );
+        return (
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen
+                        name="LoadingScreen"
+                        options={{headerShown: false}}
+                        component={LoadingScreen}
+                    />
+                    <Stack.Screen
+                        name="SchoolSearch"
+                        options={{headerShown: false}}
+                        component={SchoolSearch}
+                    />
+                    <Stack.Screen
+                        name="LoginScreen"
+                        options={{headerShown: false}}
+                        component={LoginScreen}
+                    />
+                    <Stack.Screen
+                        name="Main"
+                        options={{headerShown: false}}
+                        component={Main}
+                    />
+                    <Stack.Screen name={"Day"}
+                                  options={{headerShown: false}}
+                                  component={DailyView}
+                    />
+                    <Stack.Screen name={"Grid"}
+                                  options={{headerShown: false}}
+                                  component={TimeGrid}
+                    />
+                </Stack.Navigator>
+            </NavigationContainer>
+        );
     }
 }
 

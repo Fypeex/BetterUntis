@@ -1,5 +1,5 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity, StatusBar} from "react-native";
+import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 import {weeklyView} from "./Components/WeeklyView"
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
@@ -13,44 +13,39 @@ class Main extends React.Component {
         super(props);
         this.state = {
             timeGridLeft: [
-                <TimeGrid key={99}/>
+                <TimeGrid key={99} nav = {this.props.navigation}/>
             ],
             days: [
 
             ],
             view:[
-                <DailyView style={styles.dailyView}  key={98} day={20201209}/>
+                <DailyView key={98} day={20201209} nav = {this.props.navigation}/>
             ]
         }
     }
     async componentDidMount() {
-        let school = JSON.parse(await AsyncStorage.getItem("School"))
-        let session = JSON.parse(await AsyncStorage.getItem("Session"));
-        //let TimeTable = await t.getTimeTable(school.serverUrl, session.sessionId, school.loginName)
-
-
     }
     render() {
         return(
             <View style={styles.container}>
-                <StatusBar  barStyle="light-content" hidden={true} translucent={true} />
                 <View style={styles.header} key={32}>
                     <TouchableOpacity onPress={
                         async () => {
                             await AsyncStorage.clear()
                             this.props.navigation.navigate("SchoolSearch")
-                    }}>
-                        <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>
+                        }}>
+                        <Ionicons name="md-options" style={styles.icon} size={32}/>
                     </TouchableOpacity>
                 </View>
-                    {
-                        this.state.days.map((key) => {
-                            return key
-                        })
-                    }
+
+                {
+                    this.state.days.map((key) => {
+                        return key
+                    })
+                }
                 <View style={styles.ttContainer}>
                     <View style={styles.LeftBar} key={0}>
-                            <TimeGrid/>
+                        <TimeGrid/>
                     </View>
                     <View style={styles.smallTTContainer} key={1}>
                         {
@@ -90,6 +85,7 @@ const styleVars = {
     thirdColor: "rgb(75,75,75)",
     whiteColor:  "rgb(226, 226, 226)",
     headerColor: "rgb(42, 43, 58)",
+    accentColor: "rgb(225,63,85)",
 }
 
 const styles = StyleSheet.create({
@@ -133,6 +129,10 @@ const styles = StyleSheet.create({
         backgroundColor: col.mainbg,
     },
 
+    header: {
+        height:80,
+        backgroundColor: styleVars.secondaryColor,
+    }
 })
 
 export default Main
