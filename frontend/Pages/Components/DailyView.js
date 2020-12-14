@@ -34,7 +34,6 @@ export class DailyView extends Component{
 
 
     async renderLessons() {
-        AsyncStorage.clear()
         if (!this.state.lessonsRendered) {
 
             let school = await getSchool()

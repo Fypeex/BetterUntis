@@ -2,7 +2,7 @@ const fetches = require("./fetches.js")
 //Dont touch this
 //Init all variables needed to login/fetch the timetables and other data
 ///////////////////////////////////////////////////////////////////////////////////
-//Data needed for the fetch                                                      //
+//Navigation needed for the fetch                                                      //
 /*                                                                               */
 /*                                                                               */
 exports.searchSchool = async function searchSchool(query) {

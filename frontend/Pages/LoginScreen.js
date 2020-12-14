@@ -46,7 +46,7 @@ class LoginScreen extends React.Component {
                     await AsyncStorage.setItem("Session", JSON.stringify(r.data.result))
                     await AsyncStorage.setItem("Creds", JSON.stringify({username: this.state.username, password: this.state.password}))
                     await AsyncStorage.setItem("State","LOGGED_IN")
-                    this.props.navigation.navigate("Main")
+                    this.props.navigation.navigate("DrawerNav",{screen:"Main"})
                 }
             })
         }
