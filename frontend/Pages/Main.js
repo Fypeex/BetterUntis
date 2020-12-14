@@ -5,6 +5,7 @@ import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
 import t from "../backend/modules/getTimeTable"
 import l from "../backend/modules/accountHandling"
+import {Ionicons} from "@expo/vector-icons";
 
 class Main extends React.Component {
     constructor(props) {
@@ -17,7 +18,7 @@ class Main extends React.Component {
 
             ],
             view:[
-                <DailyView key={98} day={20201109}/>
+                <DailyView key={98} day={20201209}/>
             ]
         }
     }
@@ -32,8 +33,16 @@ class Main extends React.Component {
         return(
             <View style={styles.container}>
                 <StatusBar  barStyle="light-content" hidden={true} translucent={true} />
-                <View style={styles.header} key={32}/>
-                    {
+                <View style={styles.header} key={32}>
+                    <TouchableOpacity onPress={
+                        async () => {
+                            await AsyncStorage.clear()
+                            this.props.navigation.navigate("SchoolSearch")
+                    }}>
+                        <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>
+                    </TouchableOpacity>
+                </View>
+{
                         this.state.days.map((key) => {
                             return key
                         })
@@ -65,7 +74,10 @@ const styleVars = {
     accentColor: "rgb(83, 139, 85)",
 }
 const styles = StyleSheet.create({
-
+    icon:{
+        paddingTop:30,
+        paddingLeft:10,
+    },
     buttonGradient:{
         marginTop: 20,
         borderRadius: 90,

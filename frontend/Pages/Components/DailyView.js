@@ -1,7 +1,6 @@
 import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-native";
 import React,{Component} from "react";
 import t, {getDayTimeTable} from "../../backend/modules/getTimeTable"
-import PropTypes from 'prop-types';
 import {login} from "../../backend/modules/accountHandling"
 export class DailyView extends Component{
     constructor(props) {
@@ -85,7 +84,6 @@ export class DailyView extends Component{
                     let h = lesson.timeGridHour.split("-")
 
                     h.forEach(les => {
-                        console.log(les)
                         lessons[parseInt(les) - 1] = <View style={styles.timeGridBlock} key={parseInt(les)}>
                             <View style={styles.lesson}>
                                 <Text key={2}>{parseInt(les)}</Text>
