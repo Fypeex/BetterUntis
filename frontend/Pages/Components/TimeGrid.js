@@ -5,7 +5,7 @@ import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 export class TimeGrid extends React.Component {
     constructor(props) {
         super(props);
-
+        this.navigation = this.props.navigation
         this.state = {
             timeGrid:[]
         }
@@ -15,7 +15,7 @@ export class TimeGrid extends React.Component {
         let endTime = 755;
         let timeGridLeft = [
             <View style={styles.timeGridBlock} key={65}/>
-            ]
+        ]
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].startTime === endTime) {
                 timeGridLeft.push(
@@ -39,12 +39,22 @@ export class TimeGrid extends React.Component {
         return timeGridLeft
     }
     async componentDidMount() {
-        await AsyncStorage.removeItem("School")
-        console.log("Props: ")
-        this.props.navigation.navigate("LoginScreen")
-        let school = await getSchool(this.props.navigation)
-        let session = await getSession(this.props.navigation)
-        let grid = await getGrid(this.props.navigation,school,session)
+
+        let nav = this.props.navigation
+
+        let school = await getSchool()
+        if(school=== null) {
+            this.props.nav.navigate("SchoolSearch")
+            return
+        }
+
+        let session = await getSession()
+        if(session === null) {
+            this.props.nav.navigate("SchoolSearch")
+            return
+        }
+
+        let grid = await getGrid(school)
         let timeGrid = this.renderTimeGrid(grid)
         this.setState({timeGrid})
 
@@ -53,7 +63,7 @@ export class TimeGrid extends React.Component {
         return (
             this.state.timeGrid.map((key) => {
                 return key
-                })
+            })
         );
     }
 }

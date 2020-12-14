@@ -31,7 +31,7 @@ exports.login = async (url,username,password) => {
 ////////////////////////////////////////////////////////////////////////////////
 /*                                                                            */
 /*                                                                            */
-exports.login = async function (url,username,password) {
+exports.logout = async function (url,username,password) {
     return axios({
         method: "post",
         url: url.split("?")[0] + "/jsonrpc.do?" + url.split("?")[1],
