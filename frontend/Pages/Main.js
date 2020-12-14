@@ -1,5 +1,5 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
+import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity, StatusBar} from "react-native";
 import {weeklyView} from "./Components/WeeklyView"
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
@@ -32,6 +32,7 @@ class Main extends React.Component {
     render() {
         return(
             <View style={styles.container}>
+                <StatusBar  barStyle="light-content" hidden={true} translucent={true} />
                 <View style={styles.header} key={32}>
                     <TouchableOpacity onPress={
                         async () => {
@@ -41,7 +42,7 @@ class Main extends React.Component {
                         <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>
                     </TouchableOpacity>
                 </View>
-                    {
+{
                         this.state.days.map((key) => {
                             return key
                         })
@@ -70,7 +71,7 @@ const styleVars = {
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
     whiteColor:  "rgb(226, 226, 226)",
-    accentColor: "rgb(225,63,85)",
+    accentColor: "rgb(83, 139, 85)",
 }
 const styles = StyleSheet.create({
     icon:{
@@ -114,8 +115,8 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        height:80,
-        backgroundColor: styleVars.secondaryColor,
+        height:60,
+        backgroundColor: styleVars.accentColor,
     }
 })
 

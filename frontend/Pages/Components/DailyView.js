@@ -144,78 +144,51 @@ const styleVars = {
     backroundColor: "rgb(20,20,20)",
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
+    fourthColor: "rgb(100,100,100)",
     whiteColor:  "rgb(226, 226, 226)",
-    accentColor: "rgb(225,63,85)",
-}
+    accentColor: "rgb(83, 139, 85)",
+} 
 const styles = StyleSheet.create({
     lesson: {
-      margin:5,
-      backgroundColor:"cyan",
+        margin:5,
         flex:1,
     },
     day: {
         flex:1,
     },
-    buttonGradient:{
-        marginTop: 20,
-        borderRadius: 90,
-    },
-
-    ttContainer: {
-        flexDirection: "row",
-        flex:1,
-        backgroundColor:"black",
-    },
-    smallTTContainer: {
-        flexDirection: "row",
-        flex:11/12,
-    },
-    TopBar: {
-        flexDirection:"row",
-        height:100,
-        flex:1,
-    },
-    LeftBar: {
-        backgroundColor:"gray",
-        flex:1/6,
-    },
-    gradient:{
-        flex:1,
-        justifyContent:"center",
-        alignItems:"center",
-        width: '100%',
-        height: '100%',
-    },
-    container: {
-        flex: 1,
-        backgroundColor: styleVars.backroundColor,
-    },
     timetable:{
         borderWidth: 1,
-        flex:5/6,
-    },
-
-    header: {
-        height:80,
-        backgroundColor: styleVars.secondaryColor,
+        flex:6/6,
     },
     date:{
-        backgroundColor:"gray",
-        borderWidth:0.3,
-        flex:1,
+        backgroundColor: styleVars.backroundColor,
+        flex:1/1,
+        borderWidth: 0.4,
+        borderColor: styleVars.whiteColor,
+        borderRightWidth: 0,
+        borderBottomWidth:0,
     },
     dateText: {
-        color:"white",
-        fontSize:8,
+        paddingLeft: 7.5,
+        paddingTop: 3,
+        color: styleVars.whiteColor,
+        fontSize:25,
     },
     breakBlock: {
-        backgroundColor:"lightgray",
-        height:20,
-        borderWidth:0.3,
+        backgroundColor: styleVars.backroundColor,
+        height:10,
+
+        borderWidth: 0.4,
+        borderColor: styleVars.whiteColor,
+        borderRightWidth:0,
     },
     timeGridBlock:{
         flex:1,
-        backgroundColor:"lightgray",
-        borderWidth:0.8,
+        backgroundColor: styleVars.secondaryColor,
+        borderLeftWidth: 0.4,
+        borderLeftColor: styleVars.whiteColor,
+
+        borderTopWidth: 0.4,
+        borderTopColor: "rgba(0,0,0,0)",
     },
 })

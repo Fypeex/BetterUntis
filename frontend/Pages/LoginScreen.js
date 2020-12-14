@@ -6,7 +6,9 @@ import {
     StyleSheet,
     Text,
     View,
+    StatusBar,
 } from 'react-native';
+import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 const l = require("../backend/modules/accountHandling")
@@ -52,8 +54,9 @@ class LoginScreen extends React.Component {
     render(){
        return (
                 <View style={styles.container} key={0}>
+                    <StatusBar  barStyle="light-content" hidden={true} translucent={true} />
                     <LinearGradient 
-                        colors={["rgb(50,50,50)", "rgb(20,20,20)"]}
+                        colors={["rgb(60,60,60)", "rgb(15,15,15)"]}
                         start={[-0.66,0]}
                         style={styles.gradient}>
                     
@@ -82,7 +85,7 @@ class LoginScreen extends React.Component {
                     }
                         <LinearGradient  //Login Button + Gradient
                         //colors={["rgb(163,32,50)", "rgb(225,63,85)"]}
-                        colors={["rgb(200,40,60)", "rgb(234,77,98)"]}
+                        colors={["rgb(53,130,55)", "rgb(62,156,65)"]}
                         start={[1,0]}
                         style={styles.buttonGradient}>
                         <TouchableOpacity styles={styles.loginButton} onPress = {(key) => {
@@ -111,7 +114,7 @@ const styleVars = {
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
     whiteColor:  "rgb(226, 226, 226)",
-    accentColor: "rgb(225,63,85)",
+    accentColor: "rgb(53,130,55)",
 }
   
 const styles = StyleSheet.create({
@@ -139,7 +142,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     icon: {
-        paddingTop:40,
+        paddingTop:15,
         paddingLeft:20,
         color: styleVars.whiteColor,
     },
@@ -167,7 +170,7 @@ const styles = StyleSheet.create({
         padding: 5,
         paddingHorizontal: 35,
         width: "100%",
-        fontSize: 27,
+        fontSize: 23,
         borderRadius: 90,
         textAlign: "center",
         color: styleVars.whiteColor,
@@ -178,7 +181,7 @@ const styles = StyleSheet.create({
         borderRadius: 90,
     },
     header: {
-        height:80,
+        height:60,
         backgroundColor: styleVars.secondaryColor,
     },
     infobox: {
@@ -190,16 +193,8 @@ const styles = StyleSheet.create({
         marginLeft:20,
         marginRight:20,
         marginBottom:75,
-        shadowColor: "#fff",
-        shadowOffset:{
-            width: 0,
-            height: 12,
-        },
-        shadowOpacity: 1,
-        shadowRadius: 16.00,
-        elevation: 10,
         minHeight:100,
-        backgroundColor:styleVars.secondaryColor,
+        //backgroundColor:styleVars.secondaryColor,
         borderRadius: 3,
 
     },

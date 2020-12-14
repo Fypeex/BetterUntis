@@ -89,86 +89,41 @@ const styleVars = {
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
     whiteColor:  "rgb(226, 226, 226)",
-    accentColor: "rgb(225,63,85)",
+    accentColor: "rgb(83, 139, 85)",
 }
 const styles = StyleSheet.create({
-    topLeft:{
-        flex:1/6
-    },
-    buttonGradient:{
-        marginTop: 20,
-        borderRadius: 90,
-    },
+
     breakBlock: {
-        height:20,
-        borderWidth:0.3,
+        height:10,
+        backgroundColor: styleVars.backroundColor,
+        borderTopWidth: 0.4,
+        borderTopColor: styleVars.whiteColor,
     },
     timeGridBlock:{
         flex:1,
-        borderWidth:0.8,
-    },
-    startTime:{
-        fontSize: 9,
-        textAlign:"left",
-    },
-    endTime:{
-        fontSize: 9,
-        textAlign:"right",
-    },
-    periodNumber: {
-        textAlign:"center",
-        fontSize:11,
-    },
-    ttContainer: {
-        flexDirection: "row",
-        flex:1,
-        backgroundColor:"black",
-    },
-    smallTTContainer: {
-        flexDirection: "row",
-        flex:11/12,
-    },
-    TopBar: {
-        flexDirection:"row",
-        height:100,
-        flex:0.1,
-    },
-    LeftBar: {
-        backgroundColor:"gray",
-        flex:1/6,
-    },
-    gradient:{
-        flex:1,
-        justifyContent:"center",
-        alignItems:"center",
-        width: '100%',
-        height: '100%',
-    },
-    container: {
-        flex: 1,
-        backgroundColor: styleVars.backroundColor,
-    },
-    timetable:{
-        borderWidth: 1,
-        flex:5/6,
-    },
-    lesson: {
-        flex:1/5,
-        borderWidth: 1,
-    },
-    text: {
-        fontSize:10,
-    },
-    header: {
-        height:80,
+        flexDirection: "column",
+        justifyContent: "center",
+        borderTopWidth: 0.4,
+        borderColor: styleVars.whiteColor,
         backgroundColor: styleVars.secondaryColor,
     },
-    date:{
-        flex:1/6,
-        borderWidth:0.3,
+    startTime:{
+        fontSize: 12,
+        textAlign:"right",
+        color: styleVars.whiteColor,
+        paddingRight: 5,
     },
-    dateText: {
-        color:"white",
-        fontSize:8,
-    }
+    endTime:{
+        fontSize: 12,
+        textAlign:"right",
+        color: styleVars.whiteColor,
+        paddingRight: 5,
+    },
+    periodNumber: {
+        position: "absolute",
+        textAlign:"left",
+        fontSize:13,
+        color: styleVars.whiteColor,
+        paddingLeft: 2,
+    },
 })
