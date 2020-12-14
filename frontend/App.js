@@ -1,51 +1,55 @@
-import { StatusBar } from 'expo-status-bar';
+import 'react-native-gesture-handler';
 import React from 'react';
-import { TouchableOpacity, ImageBackground, StyleSheet, Text, View } from 'react-native';
-import {RNTesterThemeContext} from "react-native/RNTester/js/components/RNTesterTheme";
+import {Button, StyleSheet, View, Text, AsyncStorage} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import SchoolSearch from './Pages/SchoolSearch';
+import LoginScreen from "./Pages/LoginScreen";
+import LoadingScreen from "./Pages/LoadingScreen"
+import Main from "./Pages/Main"
+const Stack = createStackNavigator();
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <ImageBackground source={{ uri: "https://i.imgur.com/hMG7oyM.jpeg" }} style={styles.logo}>
-        <Text style={styles.instructions}>
-          To share a photo from your phone with a friend, just press the button below!
-        </Text>
-      <TouchableOpacity
-        onPress={()=>{alert("Hello World")}}
-        style={styles.button}>
-        <Text style={styles.buttonText}>Pick a photo</Text>
-      </TouchableOpacity>
-      </ImageBackground>
-      <StatusBar style="auto" />
-    </View>
-  );
+class App extends React.Component {
+    render() {
+            return (
+                <NavigationContainer>
+                    <Stack.Navigator>
+                        <Stack.Screen
+                            name="LoadingScreen"
+                            options={{headerShown: false}}
+                            component={LoadingScreen}
+                        />
+                        <Stack.Screen
+                            name="SchoolSearch"
+                            options={{headerShown: false}}
+                            component={SchoolSearch}
+                        />
+                        <Stack.Screen
+                            name="LoginScreen"
+                            options={{headerShown: false}}
+                            component={LoginScreen}
+                        />
+                        <Stack.Screen
+                            name="Main"
+                            options={{headerShown: false}}
+                            component={Main}
+                            />
+                    </Stack.Navigator>
+                </NavigationContainer>
+            );
+    }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: '#fff',
-  },
-  logo: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex:1,
-    resizeMode: "cover",
-  },
-  instructions: {
-    color: '#888',
-    fontSize: 18,
-    marginHorizontal: 15,
-  },
-  button: {
-    flex:0.05,
-    width:200,
-    backgroundColor: "orange",
-    borderRadius:10,
-  },
-  buttonText: {
-    fontSize:20,
-  }
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    button: {
+        marginTop: 200,
+    }
 });
+
+export default App;
