@@ -63,7 +63,7 @@ export class DailyView extends Component{
             let tt = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
             for (let k = 0; k < lessons.length; k++) {
-                lessons[k] = <View style={styles.timeGridBlock} key={(k+1) * 17}>
+                lessons[k] = <View style={(k === lessons.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={(k+1) * 17}>
                     <Text>{k * 17}</Text>
                 </View>
             }
@@ -140,13 +140,35 @@ export class DailyView extends Component{
     }
 
 }
+
+
+const col = {
+    headerCol: "rgb(150, 31, 31)",
+    mainbg: "rgb(18, 150, 18)",
+    content: "rgb(28, 28, 150)",
+    accent: "rgb(187, 134, 252)",
+    accentDark: "rgb(178, 124, 243)",
+    white: "rgb(232, 232, 232)",
+}
+
+const realcol = {
+    headerCol: "rgb(31, 31, 31)",
+    mainbg: "rgb(18, 18, 18)",
+    content: "rgb(28, 28, 28)",
+    accent: "rgb(187, 134, 252)",
+    accentDark: "rgb(178, 124, 243)",
+    white: "rgb(232, 232, 232)",
+}
+
+
 const styleVars = {
-    backroundColor: "rgb(20,20,20)",
+    backroundColor: "rgb(31,31,31)",
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
     fourthColor: "rgb(100,100,100)",
     whiteColor:  "rgb(226, 226, 226)",
     accentColor: "rgb(83, 139, 85)",
+    background: "rgb(23, 24, 25)",
 } 
 const styles = StyleSheet.create({
     lesson: {
@@ -157,38 +179,53 @@ const styles = StyleSheet.create({
         flex:1,
     },
     timetable:{
-        borderWidth: 1,
+        //borderWidth: 1,
         flex:6/6,
     },
     date:{
         backgroundColor: styleVars.backroundColor,
         flex:1/1,
-        borderWidth: 0.4,
-        borderColor: styleVars.whiteColor,
+        //borderWidth: 0.4,
+        borderColor: styleVars.black,
         borderRightWidth: 0,
         borderBottomWidth:0,
+        borderTopRightRadius:6,
     },
     dateText: {
-        paddingLeft: 7.5,
-        paddingTop: 3,
+        textAlign: "center",
         color: styleVars.whiteColor,
         fontSize:25,
+        backgroundColor: col.mainbg,
+        borderRadius:3,
+        margin:3,
     },
     breakBlock: {
         backgroundColor: styleVars.backroundColor,
-        height:10,
+        height:15,
+        //marginHorizontal:3,
+        //borderRadius:3,
 
-        borderWidth: 0.4,
+        //borderWidth: 0.4,
         borderColor: styleVars.whiteColor,
         borderRightWidth:0,
     },
     timeGridBlock:{
         flex:1,
-        backgroundColor: styleVars.secondaryColor,
-        borderLeftWidth: 0.4,
+        backgroundColor: col.white,
+        //borderLeftWidth: 0.4,
         borderLeftColor: styleVars.whiteColor,
 
-        borderTopWidth: 0.4,
+        //borderTopWidth: 0.4,
         borderTopColor: "rgba(0,0,0,0)",
     },
+    timeGridBlockBorder:{
+        flex:1,
+        backgroundColor: col.white,
+        //borderLeftWidth: 0.4,
+        borderLeftColor: styleVars.whiteColor,
+
+        //borderTopWidth: 0.4,
+        borderTopColor: "rgba(0,0,0,0)",
+        borderBottomRightRadius:6,
+    }
 })
