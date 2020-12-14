@@ -1,36 +1,14 @@
 import React from "react"
-import t from "../../backend/modules/getTimeTable";
 import {AsyncStorage, StyleSheet, Text, View} from "react-native";
-import l from "../../backend/modules/accountHandling";
+import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 
 export class TimeGrid extends React.Component {
-    constructor(p) {
-        super(p);
+    constructor(props) {
+        super(props);
 
         this.state = {
             timeGrid:[]
         }
-    }
-    async login(school){
-        let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
-        if(creds === undefined || creds === null || creds.username === null || creds.password === null || creds.username === undefined || creds.password === undefined) {
-            await AsyncStorage.setItem("Session","LOGGED_OUT")
-            this.props.navigation.navigate("LoginScreen")
-        }
-        else {
-            return l.login(school.serverUrl, creds.username, creds.password);
-        }
-    }
-    async getGrid(school,session) {
-        let grid = JSON.parse(await AsyncStorage.getItem("timeGrid"))
-        if(grid === undefined || grid === null) {
-            grid = await t.getTimeGrid(school, session).then(r => {
-                return r
-            })
-        }
-        await AsyncStorage.setItem("timeGrid",JSON.stringify(grid))
-
-        return grid
     }
     renderTimeGrid(TimeGrid) {
         let rows = TimeGrid.data.rows
@@ -61,16 +39,12 @@ export class TimeGrid extends React.Component {
         return timeGridLeft
     }
     async componentDidMount() {
-        let school = JSON.parse(await AsyncStorage.getItem("School"))
-        let session = JSON.parse(await AsyncStorage.getItem("Session"));
-
-
-        let grid = await this.getGrid(school,session)
-            if(grid.error && grid.error.message === "not authenticated") {
-                let session = await this.login(school)
-                grid = await this.getGrid(school, session)
-            }
-
+        await AsyncStorage.removeItem("School")
+        console.log("Props: ")
+        this.props.navigation.navigate("LoginScreen")
+        let school = await getSchool(this.props.navigation)
+        let session = await getSession(this.props.navigation)
+        let grid = await getGrid(this.props.navigation,school,session)
         let timeGrid = this.renderTimeGrid(grid)
         this.setState({timeGrid})
 

@@ -18,13 +18,14 @@ class Main extends React.Component {
 
             ],
             view:[
-                <DailyView key={98} day={20201209}/>
+                <DailyView key={98}/>
             ]
         }
     }
     async componentDidMount() {
         let school = JSON.parse(await AsyncStorage.getItem("School"))
         let session = JSON.parse(await AsyncStorage.getItem("Session"));
+
         //let TimeTable = await t.getTimeTable(school.serverUrl, session.sessionId, school.loginName)
 
 
@@ -36,7 +37,6 @@ class Main extends React.Component {
                 <View style={styles.header} key={32}>
                     <TouchableOpacity onPress={
                         async () => {
-                            await AsyncStorage.clear()
                             this.props.navigation.navigate("SchoolSearch")
                     }}>
                         <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>

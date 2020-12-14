@@ -2,17 +2,13 @@ import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-nativ
 import React,{Component} from "react";
 import t, {getDayTimeTable} from "../../backend/modules/getTimeTable"
 import {login} from "../../backend/modules/accountHandling"
+import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 export class DailyView extends Component{
     constructor(props) {
         super(props);
-
-        let startingDay = Date.now()
-        let s = new Date(startingDay).toLocaleString().split(",")[0].split("/")
-        let d = s[1]
-        let m = s[0]
-        let y = s[2]
+        let [m, d, y]    = new Date().toLocaleDateString("en-US").split("/")
         this.date = d+"/"+m+"/"+y
-        this.day = y+m+d
+        this.day = "20"+y+m+d
         this.state = {
             days:[],
             lessons:[],
@@ -40,45 +36,25 @@ export class DailyView extends Component{
 
     async renderLessons() {
         if (!this.state.lessonsRendered) {
-            let session = JSON.parse(await AsyncStorage.getItem("Session"));
-            if(session === undefined) {
-                this.props.navigation.navigate("LoginScreen")
-            }
-            let school = JSON.parse(await AsyncStorage.getItem("School"))
-            if(school === undefined) {
-                this.props.navigation.navigate("SchoolSearch")
-            }
 
-
-            let grid = JSON.parse(await AsyncStorage.getItem("timeGrid"))
-            if (grid === undefined || grid === null) {
-                grid = await t.getTimeGrid(school, session).then(r => {
-                    return r
-                })
-            }
-            await AsyncStorage.setItem("timeGrid", JSON.stringify(grid))
+            let school = await getSchool(this.props.navigation)
+            let session = await getSession(this.props.navigation)
+            let grid = await getGrid(this.props.navigation)
             let day = this.props.day
             if(day === undefined) day = this.day
 
             let tt = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
             for (let k = 0; k < lessons.length; k++) {
-                lessons[k] = <View style={styles.timeGridBlock} key={(k+1) * 17}>
-                    <Text>{k * 17}</Text>
-                </View>
+                lessons[k] = <View style={styles.timeGridBlock} key={(k+1) * 17}/>
             }
             if(tt !== 400) {
-
-
                 if (tt.data.isSessionTimeout) {
                     console.log("New Session")
-                    let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
-                    session = await login(school.serverUrl, creds.username, creds.password)
-                    session = session.data.result
-                    tt = await getDayTimeTable(20201210, session, school)
+                    session = getNewSession(this.props.navigation,school)
+                    tt = await getDayTimeTable(day, session, school)
 
                 }
-
                 tt.data.data.dayTimeTable.forEach(lesson => {
 
                     let h = lesson.timeGridHour.split("-")
@@ -86,14 +62,18 @@ export class DailyView extends Component{
                     h.forEach(les => {
                         lessons[parseInt(les) - 1] = <View style={styles.timeGridBlock} key={parseInt(les)}>
                             <View style={styles.lesson}>
-                                <Text key={2}>{parseInt(les)}</Text>
-                                <Text key={0}>{lesson.subject}</Text>
-                                <Text key={1}>{lesson.room}</Text>
+                                <Text key={0} style={styles.lessonInfo}>{lesson.subject}</Text>
+                                <Text key={2} style={styles.lessonInfo}>{lesson.klasse}</Text>
+                                <Text key={1} style={styles.lessonInfo}>{lesson.room}</Text>
+                                <Text key={3} style={styles.lessonInfo}>{lesson.teacher}</Text>
                             </View>
                         </View>
                     })
                 })
+            }else {
+                alert("Error fetching timetable")
             }
+
             let rows = grid.data.rows
                 let endTime = 755
                 let s = 0;
@@ -103,7 +83,7 @@ export class DailyView extends Component{
                     } else {
 
                         lessons.splice(i + s, 0, <View style={styles.breakBlock}
-                                                       key={s * 20}><Text>{s * 20}</Text></View>)
+                                                       key={s * 20}/>)
                         s++
                         endTime = rows[i + 1].startTime
                     }
@@ -191,4 +171,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 0.4,
         borderTopColor: "rgba(0,0,0,0)",
     },
+    lessonInfo:{
+        fontSize: 7,
+    }
 })
