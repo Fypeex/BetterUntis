@@ -1,5 +1,5 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity, StatusBar} from "react-native";
+import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 import {weeklyView} from "./Components/WeeklyView"
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
@@ -12,37 +12,31 @@ class Main extends React.Component {
         super(props);
         this.state = {
             timeGridLeft: [
-                <TimeGrid key={99}/>
+                <TimeGrid key={99} nav = {this.props.navigation}/>
             ],
             days: [
 
             ],
             view:[
-                <DailyView key={98}/>
+                <DailyView key={98} day={20201209} nav = {this.props.navigation}/>
             ]
         }
     }
     async componentDidMount() {
-        let school = JSON.parse(await AsyncStorage.getItem("School"))
-        let session = JSON.parse(await AsyncStorage.getItem("Session"));
-
-        //let TimeTable = await t.getTimeTable(school.serverUrl, session.sessionId, school.loginName)
-
-
     }
     render() {
         return(
             <View style={styles.container}>
-                <StatusBar  barStyle="light-content" hidden={true} translucent={true} />
                 <View style={styles.header} key={32}>
                     <TouchableOpacity onPress={
                         async () => {
+                            await AsyncStorage.clear()
                             this.props.navigation.navigate("SchoolSearch")
                     }}>
-                        <Ionicons name="md-arrow-back" style={styles.icon} size={32}/>
+                        <Ionicons name="md-options" style={styles.icon} size={32}/>
                     </TouchableOpacity>
                 </View>
-{
+                    {
                         this.state.days.map((key) => {
                             return key
                         })
@@ -71,7 +65,7 @@ const styleVars = {
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
     whiteColor:  "rgb(226, 226, 226)",
-    accentColor: "rgb(83, 139, 85)",
+    accentColor: "rgb(225,63,85)",
 }
 const styles = StyleSheet.create({
     icon:{
@@ -115,8 +109,8 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        height:60,
-        backgroundColor: styleVars.accentColor,
+        height:80,
+        backgroundColor: styleVars.secondaryColor,
     }
 })
 

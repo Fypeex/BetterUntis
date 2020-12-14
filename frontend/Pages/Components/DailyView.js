@@ -1,7 +1,6 @@
 import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-native";
 import React,{Component} from "react";
 import t, {getDayTimeTable} from "../../backend/modules/getTimeTable"
-import {login} from "../../backend/modules/accountHandling"
 import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 export class DailyView extends Component{
     constructor(props) {
@@ -35,14 +34,25 @@ export class DailyView extends Component{
 
 
     async renderLessons() {
+        AsyncStorage.clear()
         if (!this.state.lessonsRendered) {
 
-            let school = await getSchool(this.props.navigation)
-            let session = await getSession(this.props.navigation)
-            let grid = await getGrid(this.props.navigation)
+            let school = await getSchool()
+            if(school=== null) {
+                this.props.nav.navigate("SchoolSearch")
+                return
+            }
+
+            let session = await getSession()
+            if(session === null) {
+                this.props.nav.navigate("SchoolSearch")
+                return
+            }
+
+            let grid = await getGrid(school)
             let day = this.props.day
             if(day === undefined) day = this.day
-
+            console.log("First")
             let tt = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
             for (let k = 0; k < lessons.length; k++) {
@@ -51,7 +61,9 @@ export class DailyView extends Component{
             if(tt !== 400) {
                 if (tt.data.isSessionTimeout) {
                     console.log("New Session")
-                    session = getNewSession(this.props.navigation,school)
+                    console.log("Second")
+                    session = await getNewSession(school)
+                    if(session === null) this.props.nav.navigate("SchoolSearch")
                     tt = await getDayTimeTable(day, session, school)
 
                 }

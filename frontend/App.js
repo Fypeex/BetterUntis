@@ -7,6 +7,9 @@ import SchoolSearch from './Pages/SchoolSearch';
 import LoginScreen from "./Pages/LoginScreen";
 import LoadingScreen from "./Pages/LoadingScreen"
 import Main from "./Pages/Main"
+import {DailyView} from "./Pages/Components/DailyView"
+import {TimeGrid} from "./Pages/Components/TimeGrid";
+
 const Stack = createStackNavigator();
 
 class App extends React.Component {
@@ -33,7 +36,15 @@ class App extends React.Component {
                             name="Main"
                             options={{headerShown: false}}
                             component={Main}
-                            />
+                        />
+                        <Stack.Screen name={"Day"}
+                            options={{headerShown: false}}
+                            component={DailyView}
+                        />
+                        <Stack.Screen name={"Grid"}
+                                      options={{headerShown: false}}
+                                      component={TimeGrid}
+                        />
                     </Stack.Navigator>
                 </NavigationContainer>
             );
