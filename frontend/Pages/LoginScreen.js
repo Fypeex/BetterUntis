@@ -114,7 +114,7 @@ const styleVars = {
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
     whiteColor:  "rgb(226, 226, 226)",
-    accentColor: "rgb(62,156,65)",
+    accentColor: "rgb(53,130,55)",
 }
   
 const styles = StyleSheet.create({

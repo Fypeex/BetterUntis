@@ -1,7 +1,8 @@
 //Author: Felix Jungbluth
 //function to export timetable data
 const axios = require("axios")
-const fetch = require("node-fetch")
+
+
 exports.getTimeTable = async function fetchData(url,cookies,school) {
     let today = new Date();
     let dd = String(today.getDate()).padStart(2, '0');
@@ -9,7 +10,6 @@ exports.getTimeTable = async function fetchData(url,cookies,school) {
     let yyyy = today.getFullYear();
 
     today = yyyy + '-' + mm + '-' + dd;
-    console.log("Fetching data")
     return axios({
         url:`${url.split("?")[0]}/api/public/timetable/weekly/pageconfig?type=1&date=${today}&isMyTimetableSelected=true`,
         method: "get",
@@ -21,21 +21,21 @@ exports.getTimeTable = async function fetchData(url,cookies,school) {
         console.log("Error fetching TimeTable for week " + today)
     })
 }
-exports.getTimeGrid = async function getTimeGrid(school,session) {
-    session = JSON.parse(session)
-    const options = {
+
+exports.getDayTimeTable = (day,session,school) => {
+    console.log(`${school.serverUrl.split("?")[0]}/api/daytimetable/dayLesson?date=${day}&id=${session.personId}&type=${session.personType}`)
+    return axios({
+        url:`${school.serverUrl.split("?")[0]}/api/daytimetable/dayLesson?date=${day}&id=${session.personId}&type=${session.personType}`,
+        method:"get",
         headers: {
             cookie: "JSESSIONID=" + session.sessionId
         }
-    }
-    return axios.post("https://terpsichore.webuntis.com/WebUntis/jsonrpc.do?school=RFGS-Freiburg",
-        {
-            id:"ID",
-            method:"getTimegridUnits",
-            jsonrpc:"2.0"
-        },
-        options
-        ).then(r => {
+    }).catch(e => {
+        return 400
+    })
+}
+exports.getTimeGrid = async function getTimeGrid(school,session) {
+    return axios.get(school.serverUrl.split("?")[0]+"/api/public/timegrid").then(r => {
         return r.data
     }).catch(e => {
         console.log(e)
