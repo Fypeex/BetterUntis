@@ -1,13 +1,11 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
-import {weeklyView} from "./Components/WeeklyView"
+import {StyleSheet, View, TouchableOpacity} from "react-native";
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
-import t from "../backend/modules/getTimeTable"
-import l from "../backend/modules/accountHandling"
 import {Ionicons} from "@expo/vector-icons";
 
 class Main extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -22,39 +20,39 @@ class Main extends React.Component {
             ]
         }
     }
+
     async componentDidMount() {
     }
     render() {
         return(
-            <View style={styles.container}>
-                <View style={styles.header} key={32}>
-                    <TouchableOpacity onPress={
-                        async () => {
-                            await AsyncStorage.clear()
-                            this.props.navigation.navigate("SchoolSearch")
+                <View style={styles.container}>
+                    <View style={styles.header} key={32}>
+                        <TouchableOpacity onPress={
+                            async () => {
+                                this.props.navigation.openDrawer()
                         }}>
-                        <Ionicons name="md-options" style={styles.icon} size={32}/>
-                    </TouchableOpacity>
-                </View>
-                {
-                    this.state.days.map((key) => {
-                        return key
-                    })
-                }
-                <View style={styles.ttContainer}>
-                    <View style={styles.LeftBar} key={0}>
-                        <TimeGrid/>
+                            <Ionicons name="md-options" style={styles.icon} size={32}/>
+                        </TouchableOpacity>
                     </View>
-                    <View style={styles.smallTTContainer} key={1}>
                         {
-                            this.state.view.map((key) => {
+                            this.state.days.map((key) => {
                                 return key
                             })
                         }
-                    </View>
+                    <View style={styles.ttContainer}>
+                        <View style={styles.LeftBar} key={0}>
+                                <TimeGrid/>
+                        </View>
+                        <View style={styles.smallTTContainer} key={1}>
+                            {
+                                this.state.view.map((key) => {
+                                    return key
+                                })
+                            }
+                        </View>
 
+                    </View>
                 </View>
-            </View>
         )
     }
 }

@@ -1,6 +1,6 @@
 import {AsyncStorage} from "react-native";
 import {login} from "../backend/modules/accountHandling";
-import {getTimeGrid,getDayTimeTable} from "../backend/modules/getTimeTable";
+import {getTimeGrid} from "../backend/modules/getTimeTable";
 async function getCreds() {
     let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
     if(creds === undefined) {
@@ -40,11 +40,11 @@ exports.getNewSession = async () => {
     let school = await exports.getSchool()
     console.log(school)
     if(creds === null ||creds === undefined || school === null || school===undefined) return null
-    else {
-        let session = await login(school.serverUrl, creds.username, creds.password)
-        session = session.data.result
-        await AsyncStorage.setItem("Session", JSON.stringify(session))
-    }
+
+    let session = await login(school.serverUrl, creds.username, creds.password)
+    session = session.data.result
+    await AsyncStorage.setItem("Session", JSON.stringify(session))
+
     return session
 }
 

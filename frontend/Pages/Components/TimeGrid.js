@@ -1,6 +1,6 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View} from "react-native";
-import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
+import {StyleSheet, Text, View} from "react-native";
+import {getSchool,getSession,getGrid} from "../StorageHandler"
 
 export class TimeGrid extends React.Component {
     constructor(props) {
@@ -15,7 +15,7 @@ export class TimeGrid extends React.Component {
         let endTime = 755;
         let timeGridLeft = [
             <View style={styles.timeGridBlock} key={65}/>
-        ]
+            ]
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].startTime === endTime) {
                 timeGridLeft.push(
@@ -39,18 +39,13 @@ export class TimeGrid extends React.Component {
         return timeGridLeft
     }
     async componentDidMount() {
-
-        let nav = this.props.navigation
-
         let school = await getSchool()
         if(school=== null) {
-            this.props.nav.navigate("SchoolSearch")
             return
         }
 
         let session = await getSession()
         if(session === null) {
-            this.props.nav.navigate("SchoolSearch")
             return
         }
 
@@ -63,7 +58,7 @@ export class TimeGrid extends React.Component {
         return (
             this.state.timeGrid.map((key) => {
                 return key
-            })
+                })
         );
     }
 }

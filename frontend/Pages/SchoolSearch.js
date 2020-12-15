@@ -27,13 +27,6 @@ class SchoolSearch extends React.Component {
         }
         AsyncStorage.clear()
     }
-/*
-    componentDidMount() {
-        Font.loadAsync({
-          'Raleway': require('../assets/fonts/Raleway-Light.ttf'),
-        })  
-      }
-*/
     addTextInput = async (key, text) => {
         try {
             let textInput = []

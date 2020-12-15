@@ -3,7 +3,7 @@
 const axios = require("axios")
 
 
-exports.getTimeTable = async function fetchData(url,cookies,school) {
+exports.getTimeTable = async function fetchData(url) {
     let today = new Date();
     let dd = String(today.getDate()).padStart(2, '0');
     let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -17,7 +17,7 @@ exports.getTimeTable = async function fetchData(url,cookies,school) {
     }).then(r => {
         console.log(r.data)
         return r.data
-    }).catch(e => {
+    }).catch(() => {
         console.log("Error fetching TimeTable for week " + today)
     })
 }
@@ -31,7 +31,7 @@ exports.getDayTimeTable = (day,session,school) => {
         headers: {
             cookie: "JSESSIONID=" + session.sessionId
         }
-    }).catch(e => {
+    }).catch(() => {
         return 400
     })
 }
