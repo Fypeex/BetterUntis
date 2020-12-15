@@ -8,7 +8,6 @@ import LoadingScreen from "./Pages/LoadingScreen"
 import Main from "./Pages/Main";
 import Settings from "./Pages/Settings";
 import {createDrawerNavigator} from "@react-navigation/drawer";
-import {Text,Button} from "react-native";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();

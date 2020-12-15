@@ -8,7 +8,6 @@ import {
     View,
     StatusBar,
 } from 'react-native';
-import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 const l = require("../backend/modules/accountHandling")
@@ -35,7 +34,7 @@ class LoginScreen extends React.Component {
         }
         this.setState({data})
     }
-    login = async (key) => {
+    login = async () => {
 
         if(this.state.username !== "" || this.state.password !== "") {
 

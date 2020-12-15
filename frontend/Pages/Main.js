@@ -1,10 +1,7 @@
 import React from "react"
-import {DrawerLayoutAndroid,AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
-import {weeklyView} from "./Components/WeeklyView"
+import {StyleSheet, View, TouchableOpacity} from "react-native";
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
-import t from "../backend/modules/getTimeTable"
-import l from "../backend/modules/accountHandling"
 import {Ionicons} from "@expo/vector-icons";
 
 class Main extends React.Component {

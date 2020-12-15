@@ -1,6 +1,6 @@
-import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-native";
+import {Text, TouchableOpacity, View, StyleSheet} from "react-native";
 import React,{Component} from "react";
-import t, {getDayTimeTable} from "../../backend/modules/getTimeTable"
+import {getDayTimeTable} from "../../backend/modules/getTimeTable"
 import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 export class DailyView extends Component{
     constructor(props) {
@@ -149,11 +149,11 @@ const styles = StyleSheet.create({
     },
     timetable:{
         borderWidth: 1,
-        flex:6/6,
+        flex:1,
     },
     date:{
         backgroundColor: styleVars.backroundColor,
-        flex:1/1,
+        flex:1,
         borderWidth: 0.4,
         borderColor: styleVars.whiteColor,
         borderRightWidth: 0,
