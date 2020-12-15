@@ -1,10 +1,7 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity} from "react-native";
-import {weeklyView} from "./Components/WeeklyView"
+import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity,StatusBar} from "react-native";
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
-import t from "../backend/modules/getTimeTable"
-import l from "../backend/modules/accountHandling"
 import {Ionicons} from "@expo/vector-icons";
 import theme from './css';
 
@@ -23,16 +20,14 @@ class Main extends React.Component {
             ]
         }
     }
-    async componentDidMount() {
-    }
     render() {
         return(
             <View style={styles.container}>
+                <StatusBar hidden={true}/>
                 <View style={styles.header} key={32}>
                     <TouchableOpacity onPress={
                         async () => {
-                            await AsyncStorage.clear()
-                            this.props.navigation.navigate("SchoolSearch")
+                            this.props.navigation.openDrawer()
                         }}>
                         <Ionicons name="md-options" style={styles.icon} size={32}/>
                     </TouchableOpacity>
@@ -129,10 +124,6 @@ const styles = StyleSheet.create({
         backgroundColor: col.mainbg,
     },
 
-    header: {
-        height:80,
-        backgroundColor: styleVars.secondaryColor,
-    }
 })
 
 export default Main

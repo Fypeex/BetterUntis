@@ -1,5 +1,3 @@
-const fetches = require("./fetches.js");
-const cookieHandler = require("./cookieHandler.js");
 const axios = require("axios")
 
 //LOGIN Dont touch this

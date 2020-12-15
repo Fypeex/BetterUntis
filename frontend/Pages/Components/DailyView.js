@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     },
     date:{
         backgroundColor: styleVars.backroundColor,
-        flex:1/1,
+        flex:1,
         //borderWidth: 0.4,
         borderColor: styleVars.black,
         borderRightWidth: 0,
@@ -221,5 +221,5 @@ const styles = StyleSheet.create({
         //borderTopWidth: 0.4,
         borderTopColor: "rgba(0,0,0,0)",
         borderBottomRightRadius:6,
-    }
+    },
 })

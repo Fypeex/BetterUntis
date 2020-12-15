@@ -1,18 +1,11 @@
 import React from 'react';
 import {
     AsyncStorage,
-    TouchableOpacity,
-    TextInput,
-    Button,
     StyleSheet,
-    Text,
     View,
     ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from '@expo/vector-icons';
-import validate from "react-native-web/dist/exports/StyleSheet/validate";
-const ss = require("../backend/modules/schoolSearch.js")
 
 class LoadingScreen extends React.Component {
     constructor(props) {
@@ -24,7 +17,7 @@ class LoadingScreen extends React.Component {
 
         switch (state) {
             case "LOGGED_IN":
-                this.props.navigation.navigate("Main")
+                this.props.navigation.navigate("DrawerNav",{screen:"Main"})
                 break;
             case "SEARCH_SCHOOL":
                 this.props.navigation.navigate("SchoolSearch")
