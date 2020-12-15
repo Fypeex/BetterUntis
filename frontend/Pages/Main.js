@@ -3,7 +3,7 @@ import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity,StatusBar} from "
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
 import {Ionicons} from "@expo/vector-icons";
-import theme from './css';
+import {col} from './col';
 
 class Main extends React.Component {
     constructor(props) {
@@ -56,33 +56,6 @@ class Main extends React.Component {
     }
 }
 
-
-const col = {
-    headerCol: "rgb(150, 31, 31)",
-    mainbg: "rgb(18, 150, 18)",
-    content: "rgb(28, 28, 150)",
-    accent: "rgb(187, 134, 252)",
-    accentDark: "rgb(178, 124, 243)",
-    white: "rgb(232, 232, 232)",
-}
-
-const realcol = {
-    headerCol: "rgb(31, 31, 31)",
-    mainbg: "rgb(18, 18, 18)",
-    content: "rgb(28, 28, 28)",
-    accent: "rgb(187, 134, 252)",
-    accentDark: "rgb(178, 124, 243)",
-    white: "rgb(232, 232, 232)",
-}
-const styleVars = {
-    backroundColor: "rgb(31,31,31)",
-    secondaryColor: "rgb(60,60,60)",
-    thirdColor: "rgb(75,75,75)",
-    whiteColor:  "rgb(226, 226, 226)",
-    headerColor: "rgb(42, 43, 58)",
-    accentColor: "rgb(225,63,85)",
-}
-
 const styles = StyleSheet.create({
     dailyView: {
         flex:1,
@@ -97,17 +70,21 @@ const styles = StyleSheet.create({
         color: col.white,
     },
     ttContainer: {
+        backgroundColor: col.secbg,
         flexDirection: "row",
         flex:1,
-        margin: 3,
+        margin: 7.5,
         borderRadius:3,
     },
     smallTTContainer: {
+        backgroundColor: col.secbg,
+        borderTopRightRadius:6,
+        borderBottomRightRadius:7,
         flexDirection: "row",
         flex:5/6,
     },
     LeftBar: {
-        backgroundColor:"gray",
+        backgroundColor: col.secbg,
         flex:1/6,
         borderTopLeftRadius:6,
         borderBottomLeftRadius:6,

@@ -1,7 +1,9 @@
 import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-native";
 import React,{Component} from "react";
-import t, {getDayTimeTable} from "../../backend/modules/getTimeTable"
-import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
+import t, {getDayTimeTable} from "../../backend/modules/getTimeTable";
+import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler";
+import {col} from '../col';
+
 export class DailyView extends Component{
     constructor(props) {
         super(props);
@@ -76,9 +78,8 @@ export class DailyView extends Component{
                         lessons[parseInt(les) - 1] = <View style={styles.timeGridBlock} key={parseInt(les)}>
                             <View style={styles.lesson}>
                                 <Text key={0} style={styles.lessonInfo}>{lesson.subject}</Text>
-                                <Text key={2} style={styles.lessonInfo}>{lesson.klasse}</Text>
                                 <Text key={1} style={styles.lessonInfo}>{lesson.room}</Text>
-                                <Text key={3} style={styles.lessonInfo}>{lesson.teacher}</Text>
+                                <Text key={2} style={styles.lessonInfo}>{lesson.teacher}</Text>
                             </View>
                         </View>
                     })
@@ -134,92 +135,57 @@ export class DailyView extends Component{
 
 }
 
-
-const col = {
-    headerCol: "rgb(150, 31, 31)",
-    mainbg: "rgb(18, 150, 18)",
-    content: "rgb(28, 28, 150)",
-    accent: "rgb(187, 134, 252)",
-    accentDark: "rgb(178, 124, 243)",
-    white: "rgb(232, 232, 232)",
-}
-
-const realcol = {
-    headerCol: "rgb(31, 31, 31)",
-    mainbg: "rgb(18, 18, 18)",
-    content: "rgb(28, 28, 28)",
-    accent: "rgb(187, 134, 252)",
-    accentDark: "rgb(178, 124, 243)",
-    white: "rgb(232, 232, 232)",
-}
-
-
-const styleVars = {
-    backroundColor: "rgb(31,31,31)",
-    secondaryColor: "rgb(60,60,60)",
-    thirdColor: "rgb(75,75,75)",
-    fourthColor: "rgb(100,100,100)",
-    whiteColor:  "rgb(226, 226, 226)",
-    accentColor: "rgb(83, 139, 85)",
-    background: "rgb(23, 24, 25)",
-} 
 const styles = StyleSheet.create({
     lesson: {
+        backgroundColor: col.accentDark,
+        borderRadius:3,
         margin:5,
         flex:1,
+    },
+    lessonInfo:{
+        color: col.white,
+        textAlign: "center",
+
     },
     day: {
         flex:1,
     },
     timetable:{
-        //borderWidth: 1,
         flex:6/6,
     },
     date:{
-        backgroundColor: styleVars.backroundColor,
         flex:1,
-        //borderWidth: 0.4,
-        borderColor: styleVars.black,
-        borderRightWidth: 0,
-        borderBottomWidth:0,
         borderTopRightRadius:6,
     },
     dateText: {
+        color: col.white,
+        backgroundColor: col.accentDark,
         textAlign: "center",
-        color: styleVars.whiteColor,
         fontSize:20,
         alignItems: "center",
-        backgroundColor: col.mainbg,
         borderRadius:3,
         margin:3,
     },
     breakBlock: {
-        backgroundColor: styleVars.backroundColor,
+        backgroundColor: col.secbg,
         height:15,
-        //marginHorizontal:3,
-        //borderRadius:3,
-
-        //borderWidth: 0.4,
-        borderColor: styleVars.whiteColor,
-        borderRightWidth:0,
+        borderColor: col.grey,
+        borderTopWidth: 0.5,
     },
     timeGridBlock:{
+        backgroundColor: col.secbg,
+        borderColor: col.grey,
+        borderTopWidth: 0.5,
         flex:1,
-        backgroundColor: col.white,
-        //borderLeftWidth: 0.4,
-        borderLeftColor: styleVars.whiteColor,
-
-        //borderTopWidth: 0.4,
-        borderTopColor: "rgba(0,0,0,0)",
     },
     timeGridBlockBorder:{
+        backgroundColor: col.secbg,
         flex:1,
-        backgroundColor: col.white,
-        //borderLeftWidth: 0.4,
-        borderLeftColor: styleVars.whiteColor,
-
-        //borderTopWidth: 0.4,
-        borderTopColor: "rgba(0,0,0,0)",
+        borderTopWidth: 0.5,
+        borderColor: col.grey,
         borderBottomRightRadius:6,
     },
+    lessonthingy:{
+        color: col.white
+    }
 })
