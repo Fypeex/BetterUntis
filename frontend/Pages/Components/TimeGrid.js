@@ -1,43 +1,20 @@
 import React from "react"
-import t from "../../backend/modules/getTimeTable";
 import {AsyncStorage, StyleSheet, Text, View} from "react-native";
-import l from "../../backend/modules/accountHandling";
+import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 
 export class TimeGrid extends React.Component {
-    constructor(p) {
-        super(p);
-
+    constructor(props) {
+        super(props);
+        this.navigation = this.props.navigation
         this.state = {
             timeGrid:[]
         }
     }
-    async login(school){
-        let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
-        if(creds === undefined || creds === null || creds.username === null || creds.password === null || creds.username === undefined || creds.password === undefined) {
-            await AsyncStorage.setItem("Session","LOGGED_OUT")
-            this.props.navigation.navigate("LoginScreen")
-        }
-        else {
-            return l.login(school.serverUrl, creds.username, creds.password);
-        }
-    }
-    async getGrid(school,session) {
-        let grid = JSON.parse(await AsyncStorage.getItem("timeGrid"))
-        if(grid === undefined || grid === null) {
-            grid = await t.getTimeGrid(school, session).then(r => {
-                return r
-            })
-        }
-        await AsyncStorage.setItem("timeGrid",JSON.stringify(grid))
-
-        return grid
-    }
     renderTimeGrid(TimeGrid) {
         let rows = TimeGrid.data.rows
         let endTime = 755;
-        let timeGridLeft = [
-            <View style={styles.timeGridBlock} key={65}/>
-            ]
+        let timeGridLeft = [<View style={styles.timeGridBlock}  key={65}/>]
+
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].startTime === endTime) {
                 timeGridLeft.push(
@@ -61,16 +38,22 @@ export class TimeGrid extends React.Component {
         return timeGridLeft
     }
     async componentDidMount() {
-        let school = JSON.parse(await AsyncStorage.getItem("School"))
-        let session = JSON.parse(await AsyncStorage.getItem("Session"));
 
+        let nav = this.props.navigation
 
-        let grid = await this.getGrid(school,session)
-            if(grid.error && grid.error.message === "not authenticated") {
-                let session = await this.login(school)
-                grid = await this.getGrid(school, session)
-            }
+        let school = await getSchool()
+        if(school=== null) {
+            this.props.nav.navigate("SchoolSearch")
+            return
+        }
 
+        let session = await getSession()
+        if(session === null) {
+            this.props.nav.navigate("SchoolSearch")
+            return
+        }
+
+        let grid = await getGrid(school)
         let timeGrid = this.renderTimeGrid(grid)
         this.setState({timeGrid})
 
@@ -79,10 +62,29 @@ export class TimeGrid extends React.Component {
         return (
             this.state.timeGrid.map((key) => {
                 return key
-                })
+            })
         );
     }
 }
+
+const col = {
+    headerCol: "rgb(150, 31, 31)",
+    mainbg: "rgb(18, 150, 18)",
+    content: "rgb(28, 28, 150)",
+    accent: "rgb(187, 134, 252)",
+    accentDark: "rgb(178, 124, 243)",
+    white: "rgb(232, 232, 232)",
+}
+
+const realcol = {
+    headerCol: "rgb(31, 31, 31)",
+    mainbg: "rgb(18, 18, 18)",
+    content: "rgb(28, 28, 28)",
+    accent: "rgb(187, 134, 252)",
+    accentDark: "rgb(178, 124, 243)",
+    white: "rgb(232, 232, 232)",
+}
+
 
 const styleVars = {
     backroundColor: "rgb(20,20,20)",
@@ -94,18 +96,22 @@ const styleVars = {
 const styles = StyleSheet.create({
 
     breakBlock: {
-        height:10,
-        backgroundColor: styleVars.backroundColor,
-        borderTopWidth: 0.4,
+        height:15,
+        borderRadius: 3,
+        marginHorizontal: 3,
+        backgroundColor: col.content,
+        //borderTopWidth: 0.4,
         borderTopColor: styleVars.whiteColor,
     },
     timeGridBlock:{
+        borderRadius: 3,
+        margin: 3,
         flex:1,
         flexDirection: "column",
         justifyContent: "center",
-        borderTopWidth: 0.4,
+        //borderTopWidth: 0.4,
         borderColor: styleVars.whiteColor,
-        backgroundColor: styleVars.secondaryColor,
+        backgroundColor: col.content,
     },
     startTime:{
         fontSize: 12,
@@ -125,5 +131,6 @@ const styles = StyleSheet.create({
         fontSize:13,
         color: styleVars.whiteColor,
         paddingLeft: 2,
+        fontWeight: "bold",
     },
 })

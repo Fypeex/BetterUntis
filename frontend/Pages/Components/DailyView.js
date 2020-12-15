@@ -1,18 +1,13 @@
 import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-native";
 import React,{Component} from "react";
 import t, {getDayTimeTable} from "../../backend/modules/getTimeTable"
-import {login} from "../../backend/modules/accountHandling"
+import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 export class DailyView extends Component{
     constructor(props) {
         super(props);
-
-        let startingDay = Date.now()
-        let s = new Date(startingDay).toLocaleString().split(",")[0].split("/")
-        let d = s[1]
-        let m = s[0]
-        let y = s[2]
+        let [m, d, y]    = new Date().toLocaleDateString("en-US").split("/")
         this.date = d+"/"+m+"/"+y
-        this.day = y+m+d
+        this.day = "20"+y+m+d
         this.state = {
             days:[],
             lessons:[],
@@ -40,45 +35,39 @@ export class DailyView extends Component{
 
     async renderLessons() {
         if (!this.state.lessonsRendered) {
-            let session = JSON.parse(await AsyncStorage.getItem("Session"));
-            if(session === undefined) {
-                this.props.navigation.navigate("LoginScreen")
-            }
-            let school = JSON.parse(await AsyncStorage.getItem("School"))
-            if(school === undefined) {
-                this.props.navigation.navigate("SchoolSearch")
+
+            let school = await getSchool()
+            if(school=== null) {
+                this.props.nav.navigate("SchoolSearch")
+                return
             }
 
-
-            let grid = JSON.parse(await AsyncStorage.getItem("timeGrid"))
-            if (grid === undefined || grid === null) {
-                grid = await t.getTimeGrid(school, session).then(r => {
-                    return r
-                })
+            let session = await getSession()
+            if(session === null) {
+                this.props.nav.navigate("SchoolSearch")
+                return
             }
-            await AsyncStorage.setItem("timeGrid", JSON.stringify(grid))
+
+            let grid = await getGrid(school)
             let day = this.props.day
             if(day === undefined) day = this.day
-
+            console.log("First")
             let tt = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
             for (let k = 0; k < lessons.length; k++) {
-                lessons[k] = <View style={styles.timeGridBlock} key={(k+1) * 17}>
+                lessons[k] = <View style={(k === lessons.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={(k+1) * 17}>
                     <Text>{k * 17}</Text>
                 </View>
             }
             if(tt !== 400) {
-
-
                 if (tt.data.isSessionTimeout) {
                     console.log("New Session")
-                    let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
-                    session = await login(school.serverUrl, creds.username, creds.password)
-                    session = session.data.result
-                    tt = await getDayTimeTable(20201210, session, school)
+                    console.log("Second")
+                    session = await getNewSession(school)
+                    if(session === null) this.props.nav.navigate("SchoolSearch")
+                    tt = await getDayTimeTable(day, session, school)
 
                 }
-
                 tt.data.data.dayTimeTable.forEach(lesson => {
 
                     let h = lesson.timeGridHour.split("-")
@@ -86,31 +75,35 @@ export class DailyView extends Component{
                     h.forEach(les => {
                         lessons[parseInt(les) - 1] = <View style={styles.timeGridBlock} key={parseInt(les)}>
                             <View style={styles.lesson}>
-                                <Text key={2}>{parseInt(les)}</Text>
-                                <Text key={0}>{lesson.subject}</Text>
-                                <Text key={1}>{lesson.room}</Text>
+                                <Text key={0} style={styles.lessonInfo}>{lesson.subject}</Text>
+                                <Text key={2} style={styles.lessonInfo}>{lesson.klasse}</Text>
+                                <Text key={1} style={styles.lessonInfo}>{lesson.room}</Text>
+                                <Text key={3} style={styles.lessonInfo}>{lesson.teacher}</Text>
                             </View>
                         </View>
                     })
                 })
+            }else {
+                alert("Error fetching timetable")
             }
+
             let rows = grid.data.rows
-                let endTime = 755
-                let s = 0;
-                for (let i = 0; i < rows.length; i++) {
-                    if (rows[i].startTime === endTime) {
-                        endTime = rows[i].endTime
-                    } else {
+            let endTime = 755
+            let s = 0;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].startTime === endTime) {
+                    endTime = rows[i].endTime
+                } else {
 
-                        lessons.splice(i + s, 0, <View style={styles.breakBlock}
-                                                       key={s * 20}><Text>{s * 20}</Text></View>)
-                        s++
-                        endTime = rows[i + 1].startTime
-                    }
+                    lessons.splice(i + s, 0, <View style={styles.breakBlock}
+                                                   key={s * 20}/>)
+                    s++
+                    endTime = rows[i + 1].startTime
                 }
+            }
 
-                this.setState({lessons})
-                this.state.lessonsRendered = true
+            this.setState({lessons})
+            this.state.lessonsRendered = true
 
         }
     }
@@ -140,13 +133,35 @@ export class DailyView extends Component{
     }
 
 }
+
+
+const col = {
+    headerCol: "rgb(150, 31, 31)",
+    mainbg: "rgb(18, 150, 18)",
+    content: "rgb(28, 28, 150)",
+    accent: "rgb(187, 134, 252)",
+    accentDark: "rgb(178, 124, 243)",
+    white: "rgb(232, 232, 232)",
+}
+
+const realcol = {
+    headerCol: "rgb(31, 31, 31)",
+    mainbg: "rgb(18, 18, 18)",
+    content: "rgb(28, 28, 28)",
+    accent: "rgb(187, 134, 252)",
+    accentDark: "rgb(178, 124, 243)",
+    white: "rgb(232, 232, 232)",
+}
+
+
 const styleVars = {
-    backroundColor: "rgb(20,20,20)",
+    backroundColor: "rgb(31,31,31)",
     secondaryColor: "rgb(60,60,60)",
     thirdColor: "rgb(75,75,75)",
     fourthColor: "rgb(100,100,100)",
     whiteColor:  "rgb(226, 226, 226)",
     accentColor: "rgb(83, 139, 85)",
+    background: "rgb(23, 24, 25)",
 } 
 const styles = StyleSheet.create({
     lesson: {
@@ -157,38 +172,54 @@ const styles = StyleSheet.create({
         flex:1,
     },
     timetable:{
-        borderWidth: 1,
+        //borderWidth: 1,
         flex:6/6,
     },
     date:{
         backgroundColor: styleVars.backroundColor,
         flex:1/1,
-        borderWidth: 0.4,
-        borderColor: styleVars.whiteColor,
+        //borderWidth: 0.4,
+        borderColor: styleVars.black,
         borderRightWidth: 0,
         borderBottomWidth:0,
+        borderTopRightRadius:6,
     },
     dateText: {
-        paddingLeft: 7.5,
-        paddingTop: 3,
+        textAlign: "center",
         color: styleVars.whiteColor,
-        fontSize:25,
+        fontSize:20,
+        alignItems: "center",
+        backgroundColor: col.mainbg,
+        borderRadius:3,
+        margin:3,
     },
     breakBlock: {
         backgroundColor: styleVars.backroundColor,
-        height:10,
+        height:15,
+        //marginHorizontal:3,
+        //borderRadius:3,
 
-        borderWidth: 0.4,
+        //borderWidth: 0.4,
         borderColor: styleVars.whiteColor,
         borderRightWidth:0,
     },
     timeGridBlock:{
         flex:1,
-        backgroundColor: styleVars.secondaryColor,
-        borderLeftWidth: 0.4,
+        backgroundColor: col.white,
+        //borderLeftWidth: 0.4,
         borderLeftColor: styleVars.whiteColor,
 
-        borderTopWidth: 0.4,
+        //borderTopWidth: 0.4,
         borderTopColor: "rgba(0,0,0,0)",
     },
+    timeGridBlockBorder:{
+        flex:1,
+        backgroundColor: col.white,
+        //borderLeftWidth: 0.4,
+        borderLeftColor: styleVars.whiteColor,
+
+        //borderTopWidth: 0.4,
+        borderTopColor: "rgba(0,0,0,0)",
+        borderBottomRightRadius:6,
+    }
 })

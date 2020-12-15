@@ -23,6 +23,7 @@ exports.getTimeTable = async function fetchData(url,cookies,school) {
 }
 
 exports.getDayTimeTable = (day,session,school) => {
+    console.log("TimeTable")
     console.log(`${school.serverUrl.split("?")[0]}/api/daytimetable/dayLesson?date=${day}&id=${session.personId}&type=${session.personType}`)
     return axios({
         url:`${school.serverUrl.split("?")[0]}/api/daytimetable/dayLesson?date=${day}&id=${session.personId}&type=${session.personType}`,
@@ -34,7 +35,7 @@ exports.getDayTimeTable = (day,session,school) => {
         return 400
     })
 }
-exports.getTimeGrid = async function getTimeGrid(school,session) {
+exports.getTimeGrid = async function getTimeGrid(school) {
     return axios.get(school.serverUrl.split("?")[0]+"/api/public/timegrid").then(r => {
         return r.data
     }).catch(e => {
