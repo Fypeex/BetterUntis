@@ -61,8 +61,6 @@ export class DailyView extends Component{
             }
             if(tt !== 400) {
                 if (tt.data.isSessionTimeout) {
-                    console.log("New Session")
-                    console.log("Second")
                     session = await getNewSession(school)
                     if(session === null) this.props.nav.navigate("SchoolSearch")
                     tt = await getDayTimeTable(day, session, school)

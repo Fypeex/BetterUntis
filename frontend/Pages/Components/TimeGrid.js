@@ -34,7 +34,6 @@ export class TimeGrid extends React.Component {
             }
 
         }
-
         return timeGridLeft
     }
     async componentDidMount() {
