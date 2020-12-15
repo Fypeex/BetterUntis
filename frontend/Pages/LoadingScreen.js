@@ -17,7 +17,7 @@ class LoadingScreen extends React.Component {
 
         switch (state) {
             case "LOGGED_IN":
-                this.props.navigation.navigate("Drawer",{screen:"Main"})
+                this.props.navigation.navigate("DrawerNav",{screen:"Main"})
                 break;
             case "SEARCH_SCHOOL":
                 this.props.navigation.navigate("SchoolSearch")
