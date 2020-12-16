@@ -20,9 +20,9 @@ export class TimeGrid extends React.Component {
             if (rows[i].startTime === endTime) {
                 timeGridLeft.push(
                     <View style={(i === rows.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={endTime}>
-                        <Text key={0} style={styles.startTime}> {rows[i].startTime}</Text>
-                        <Text key={1} style={styles.periodNumber}> {rows[i].period}</Text>
-                        <Text key={2} style={styles.endTime}> {rows[i].endTime}</Text>
+                        <Text key={0} style={[styles.startTime,styles.text]}> {rows[i].startTime}</Text>
+                        <Text key={1} style={[styles.periodNumber,styles.text]}> {rows[i].period}</Text>
+                        <Text key={2} style={[styles.endTime,styles.text]}> {rows[i].endTime}</Text>
                     </View>
                 )
                 endTime = rows[i].endTime

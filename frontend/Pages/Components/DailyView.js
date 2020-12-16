@@ -7,9 +7,8 @@ import {col} from '../col';
 export class DailyView extends Component{
     constructor(props) {
         super(props);
-        let [m, d, y]    = new Date().toLocaleDateString("en-US").split("/")
-        this.date = d+"/"+m+"/"+y
-        this.day = "20"+y+m+d
+        this.day = this.props.day
+
         this.state = {
             days:[],
             lessons:[],
@@ -20,18 +19,22 @@ export class DailyView extends Component{
     renderDays() {
         let day = this.props.day
         let date
+
         if(day === undefined) {date = this.date}
-        else{date = day.toString().substr(6,2)+"/"+day.toString().substr(4,2)+"/"+day.toString().substr(0,4)}
+        else{date = day.toString().substr(4,2)+"/"+day.toString().substr(6,2)+"/"+ day.toString().substr(0,4)}
+
+        let topDate = date.split("/")[1]+"/"+date.split("/")[0]
+        let botDate = new Date(date).toString().split(" ")[0]
 
         let days = []
         days.push(
             <TouchableOpacity style={styles.date} key={99}>
-                <Text style = {styles.dateText}>{date}</Text>
+                <Text style = {styles.topDate}>{topDate}</Text>
+                <Text style = {styles.bottomDate}>{botDate}</Text>
             </TouchableOpacity>
         )
 
         this.setState({days})
-        console.log("Rendered time")
     }
 
 
@@ -53,13 +56,11 @@ export class DailyView extends Component{
             let grid = await getGrid(school)
             let day = this.props.day
             if(day === undefined) day = this.day
-            console.log("First")
+
             let tt = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
             for (let k = 0; k < lessons.length; k++) {
-                lessons[k] = <View style={(k === lessons.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={(k+1) * 17}>
-                    <Text>{k * 17}</Text>
-                </View>
+                lessons[k] = <View style={(k === lessons.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={(k+1) * 17}/>
             }
             if(tt !== 400) {
                 if (tt.data.isSessionTimeout) {
@@ -68,21 +69,123 @@ export class DailyView extends Component{
                     tt = await getDayTimeTable(day, session, school)
 
                 }
-                tt.data.data.dayTimeTable.forEach(lesson => {
+                let dtt = tt.data.data.dayTimeTable
 
-                    let h = lesson.timeGridHour.split("-")
+                let entries = []
 
-                    h.forEach(les => {
-                        lessons[parseInt(les) - 1] = <View style={styles.timeGridBlock} key={parseInt(les)}>
-                            <View style={styles.lesson}>
-                                <Text key={0} style={styles.lessonInfo}>{lesson.subject}</Text>
-                                <Text key={1} style={styles.lessonInfo}>{lesson.room}</Text>
-                                <Text key={2} style={styles.lessonInfo}>{lesson.teacher}</Text>
-                            </View>
-                        </View>
+                dtt.forEach(entry => {
+                    entries.push({
+                        hour:parseInt(entry.timeGridHour),
+                        id: entry.lesson.id,
+                        entry:entry
                     })
                 })
-            }else {
+
+                let a = []
+                entries.forEach(entry => {
+
+                    a.push(entries.filter(entry2 => entry2.hour === entry.hour))
+
+
+                })
+
+                for (let i = 0;i < a.length;i++) {
+                    let style;
+                    let inc = 0
+                    if(a[i+1]) {
+                        style = []
+                        switch (a[i].length) {
+                            case 0:
+                                break;
+                            case 1:
+                                console.log(a[i][0].id === a[i + 1][0].id)
+                                if (a[i][0].id === a[i + 1][0].id) {
+
+                                    style.push(styles.multi)
+                                    inc = 1
+                                } else {
+                                    style.push(styles.single)
+                                }
+                                break;
+                            default:
+                                let l = a[i].length
+
+                                for (let f = 0; f < l; f++) {
+                                    if (a[i+1][f] && a[i][f].id === a[i + 1][f].id) {
+                                        style.push(styles.multi)
+                                        inc = 1
+                                    } else {
+                                        style.push(styles.multi)
+                                    }
+                                }
+                                break;
+                        }
+
+
+                        let component = []
+                        let z =[]
+                        let count = 0;
+                        if (style.length === 1) {
+                            for (let q = 0; q < a[i].length;q++) {
+                                component.push(
+                                    <View style={style} key={i}>
+                                        <View style={styles.innerLesson}>
+                                            <Text style={styles.lessonText}>{a[i][0].entry.subject}</Text>
+                                        </View>
+                                    </View>
+                                )
+                            }
+                        }else {
+                            let l = a[i].length
+
+                            for (let f = 0; f < l; f++) {
+                                if (a[i+1][f] && a[i][f].id === a[i + 1][f].id) {
+                                z.push(
+                                    <View style={styles.innerLesson} key={i * f * 23}>
+                                        <Text style={styles.lessonText}>{a[i][f].entry.subject}</Text>
+                                    </View>
+                                )
+
+                                    count = 1
+                                    i++
+                                }
+
+
+                            }
+                            z.reverse()
+
+                            component = <View style={[{flex:1,flexDirection:"row"},style]}>
+                                {
+                                    z.map((key) => {
+                                        return key
+                                    })
+                                }
+                            </View>
+                        }
+
+
+                        for(let t =0; t < a[i].length;t++){
+                            lessons[a[i][t].hour-1-count] = component
+                        }
+
+                        for(let t =0; t < a[i].length;t++){
+                            lessons[a[i][t].hour-count] = <View key = {(i+1)*18}/>
+                        }
+
+
+                        i+=inc
+
+                    }
+
+                }
+
+
+
+
+
+            }
+
+            else {
                 alert("Error fetching timetable")
             }
 
@@ -155,11 +258,18 @@ const styles = StyleSheet.create({
         flex:1,
         borderTopRightRadius:6,
     },
-    dateText: {
+    topDate: {
         color: col.white,
-        backgroundColor: col.accentDark,
         textAlign: "center",
-        fontSize:20,
+        fontSize:13,
+        alignItems: "center",
+        borderRadius:3,
+        margin:3,
+    },
+    bottomDate:{
+        color: col.white,
+        textAlign: "center",
+        fontSize:10,
         alignItems: "center",
         borderRadius:3,
         margin:3,
@@ -175,6 +285,21 @@ const styles = StyleSheet.create({
         borderColor: col.grey,
         borderTopWidth: 0.5,
         flex:1,
+    },
+    multi:{
+        borderColor: col.grey,
+        borderTopWidth: 0.5,
+        flex:2,
+    },
+    single: {
+        borderColor: col.grey,
+        borderTopWidth: 0.5,
+        flex:1,
+    },
+    innerLesson: {
+        flex:1,
+        backgroundColor:col.accent,
+        margin:5,
     },
     timeGridBlockBorder:{
         backgroundColor: col.secbg,

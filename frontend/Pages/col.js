@@ -6,5 +6,5 @@ exports.col = {
     accent: "rgb(121, 79, 173)",
     accentDark: "rgb(91, 44, 148)",
     white: "rgb(232, 232, 232)",
-    grey: "rgb(150,150,150)",
+    grey: "rgb(70,70,70)",
 }

@@ -23,7 +23,6 @@ exports.getSchool = async() => {
 exports.getSession = async () => {
     let school = await exports.getSchool()
     let session = JSON.parse(await AsyncStorage.getItem("Session"));
-    console.log(school)
     if(session === undefined || session === null) {
         let creds = await getCreds()
         if(creds === null ||creds === undefined || school === null || school===undefined) return null

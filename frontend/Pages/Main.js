@@ -16,7 +16,7 @@ class Main extends React.Component {
 
             ],
             view:[
-                <DailyView key={98} day={20201209} nav = {this.props.navigation}/>
+                <DailyView key={98} day={20201214} nav = {this.props.navigation}/>,
             ]
         }
     }
@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
         backgroundColor: col.secbg,
         flexDirection: "row",
         flex:1,
-        margin: 7.5,
         borderRadius:3,
     },
     smallTTContainer: {
