@@ -1,6 +1,6 @@
-import {Text, TouchableOpacity, View, StyleSheet,AsyncStorage} from "react-native";
+import {Text, TouchableOpacity, View, StyleSheet} from "react-native";
 import React,{Component} from "react";
-import t, {getDayTimeTable} from "../../backend/modules/getTimeTable";
+import {getDayTimeTable} from "../../backend/modules/getTimeTable";
 import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler";
 import {col} from '../col';
 
