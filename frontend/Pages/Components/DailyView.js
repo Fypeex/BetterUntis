@@ -1,9 +1,10 @@
-import {Text, TouchableOpacity, View, StyleSheet} from "react-native";
+import {Text, TouchableOpacity, View, StyleSheet,Dimensions} from "react-native";
 import React,{Component} from "react";
 import {getDayTimeTable} from "../../backend/modules/getTimeTable";
 import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler";
 import {col} from '../col';
-
+import Lesson from "./Lesson"
+import DetailedLessonPage from "./DetailedLessonPage"
 export class DailyView extends Component{
     constructor(props) {
         super(props);
@@ -12,6 +13,7 @@ export class DailyView extends Component{
         this.state = {
             days:[],
             lessons:[],
+            touchedLesson:[],
             lessonsRendered:false
         }
     }
@@ -62,7 +64,7 @@ export class DailyView extends Component{
             if(day === undefined) day = this.day
 
             //Get Timetable for in properties specified date
-            let tt = await getDayTimeTable(day, session, school)
+            let timeTableData = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
 
             //Prepare array of lessons. This array only contains the Grid
@@ -71,37 +73,34 @@ export class DailyView extends Component{
             }
 
             //Checks if Timetable fetch was success
-            if(tt !== 400) {
-
+            if(timeTableData !== 400) {
                 //If session timed out, get new session
-                if (tt.data.isSessionTimeout) {
+                console.log(timeTableData.data.error)
+                if (timeTableData.data.error) {
                     session = await getNewSession(school)
                     if(session === null) this.props.nav.navigate("SchoolSearch")
-                    tt = await getDayTimeTable(day, session, school)
+                    timeTableData = await getDayTimeTable(day, session, school)
 
                 }
 
                 //Specify the Daily time table
-                let dtt = tt.data.data.dayTimeTable
+                let dayTimeTable = timeTableData.data.result
 
                 let entries = []
 
                 //Push every lesson from the data into a new object with easier access to their id and timegrid place
-                dtt.forEach(entry => {
+                dayTimeTable.forEach(entry => {
                     entries.push({
-                        hour:parseInt(entry.timeGridHour),
-                        id: entry.lesson.id,
+                        hour:parseInt(entry.startTime),
+                        id: entry.su[0].id,
                         entry:entry
                     })
                 })
-
                 //Sort the array of lessons so multiple lessons can be placed on one Timegrid place
                 let a = []
                 entries.forEach(entry => {
                     a.push(entries.filter(entry2 => entry2.hour === entry.hour))
                 })
-
-
                 //Loop through all the lessons
                 for (let i = 0;i < a.length;i++) {
 
@@ -153,25 +152,40 @@ export class DailyView extends Component{
 
                         //If there is only one lesson
                         if (style.length === 1) {
-                            for (let q = 0; q < a[i].length;q++) {
+                            for (let q = 0; q < a[i].length; q++) {
                                 component.push(
-                                    <View style={style} key={i}>
-                                        <View style={styles.innerLesson}>
-                                            <Text style={styles.lessonText}>{a[i][0].entry.subject}</Text>
-                                        </View>
-                                    </View>
+                                    <TouchableOpacity style={style} key={i} onPress={() => {
+                                        let touchedLesson = [
+                                            <View style={styles.touchedContainer}>
+                                                <TouchableOpacity
+                                                    style={[styles.touchedContainer, {left: 0}]}
+                                                    onPress={() => {
+                                                        let touchedLesson = []
+                                                        this.setState({touchedLesson})
+                                                    }}
+                                                    key = {0}
+                                                />
+                                                <View style={styles.touchedLesson} key={1}>
+                                                    <DetailedLessonPage info={a[i][0].entry}/>
+                                                </View>
+                                            </View>
+                                        ]
+                                        this.setState({touchedLesson})
+                                    }}>
+                                        <Lesson info={a[i][0].entry}/>
+                                    </TouchableOpacity>
                                 )
                             }
                         }else {
                             let l = a[i].length
 
                             for (let f = 0; f < l; f++) {
-                                if (a[i+1][f] && a[i][f].id === a[i + 1][f].id) {
-                                z.push(
-                                    <View style={styles.innerLesson} key={i * f * 23}>
-                                        <Text style={styles.lessonText}>{a[i][f].entry.subject}</Text>
-                                    </View>
-                                )
+                                if (a[i + 1][f] && a[i][f].id === a[i + 1][f].id) {
+                                    z.push(
+                                        <View style={styles.innerLesson} key={i * f * 23}>
+                                            <Text style={styles.lessonText}>{a[i][f].entry.subject}</Text>
+                                        </View>
+                                    )
 
                                     count = 1
                                     i++
@@ -181,7 +195,7 @@ export class DailyView extends Component{
                             }
                             z.reverse()
 
-                            component = <View style={[{flex:1,flexDirection:"row"},style]}>
+                            component = <View style={[{flex: 1, flexDirection: "row"}, style]}>
                                 {
                                     z.map((key) => {
                                         return key
@@ -192,11 +206,13 @@ export class DailyView extends Component{
 
                         //Place components
                         for(let t =0; t < a[i].length;t++){
-                            lessons[a[i][t].hour-1-count] = component
+                            let fil = grid.data.rows.filter(gridEntry => gridEntry.startTime === a[i][t].hour)
+                            lessons[fil[0].period-1-count] = component
                         }
 
                         for(let t =0; t < a[i].length;t++){
-                            lessons[a[i][t].hour-count] = <View key = {(i+1)*18}/>
+                            let fil = grid.data.rows.filter(gridEntry => gridEntry.startTime === a[i][t].hour)
+                            lessons[fil[0].period-count] = <View key = {(i+1)*18}/>
                         }
 
 
@@ -253,7 +269,13 @@ export class DailyView extends Component{
                         return key
                     })
                 }
+                {
+                    this.state.touchedLesson.map((key) => {
+                        return key
+                    })
+                }
             </View>
+
         )
 
     }
@@ -261,6 +283,22 @@ export class DailyView extends Component{
 }
 
 const styles = StyleSheet.create({
+    touchedContainer:{
+        position: "absolute",
+        left:-60,
+        backgroundColor:"rgba(255,255,255,0.01),",
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height-60,
+        justifyContent:"center",
+        alignItems:"center",
+        zIndex: 9
+    },
+    touchedLesson: {
+        zIndex : 10,
+        backgroundColor:"white",
+        width:250,
+        height: 450,
+    },
     lesson: {
         backgroundColor: col.accentDark,
         borderRadius:3,
@@ -319,11 +357,6 @@ const styles = StyleSheet.create({
         borderColor: col.grey,
         borderTopWidth: 0.5,
         flex:1,
-    },
-    innerLesson: {
-        flex:1,
-        backgroundColor:col.accent,
-        margin:5,
     },
     timeGridBlockBorder:{
         backgroundColor: col.secbg,

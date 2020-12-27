@@ -16,7 +16,7 @@ class Main extends React.Component {
 
             ],
             view:[
-                <DailyView key={98} day={20201214} nav = {this.props.navigation}/>,
+                <DailyView key={98} day={20201222} nav = {this.props.navigation}/>,
             ]
         }
     }
