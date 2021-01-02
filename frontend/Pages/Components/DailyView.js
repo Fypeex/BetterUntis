@@ -189,7 +189,19 @@ export class DailyView extends Component{
                 }
 
             }
+            let endTime = 755
+            let s = 0;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].startTime === endTime) {
+                    endTime = rows[i].endTime
+                } else {
 
+                    lessons.splice(i + s, 0, <View style={styles.breakBlock}
+                                                   key={s * 20}/>)
+                    s++
+                    endTime = rows[i + 1].startTime
+                }
+            }
             this.setState({lessons})
             this.state.lessonsRendered = true
 
