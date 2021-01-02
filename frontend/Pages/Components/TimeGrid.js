@@ -1,5 +1,5 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View} from "react-native";
+import {AsyncStorage, StyleSheet, Text, View,TouchableOpacity} from "react-native";
 import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
 import {col} from '../col';
 
@@ -8,13 +8,14 @@ export class TimeGrid extends React.Component {
         super(props);
         this.navigation = this.props.navigation
         this.state = {
-            timeGrid:[]
+            timeGrid:[],
+            calendarVisible:false
         }
     }
     renderTimeGrid(TimeGrid) {
         let rows = TimeGrid.data.rows
         let endTime = 755;
-        let timeGridLeft = [<View style={styles.timeGridBlock}  key={65}/>]
+        let timeGridLeft = []
 
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].startTime === endTime) {
@@ -60,9 +61,11 @@ export class TimeGrid extends React.Component {
     }
     render() {
         return (
+
             this.state.timeGrid.map((key) => {
                 return key
             })
+
         );
     }
 }
@@ -109,5 +112,9 @@ const styles = StyleSheet.create({
         fontSize:13,
         paddingLeft: 2,
         fontWeight: "bold",
+    },
+    icon: {
+        paddingLeft:20,
+        color: col.white,
     },
 })

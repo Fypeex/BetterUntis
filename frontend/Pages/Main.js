@@ -1,7 +1,8 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity,StatusBar} from "react-native";
+import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity, StatusBar, Dimensions} from "react-native";
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
+import {Calendar, CalendarList,Agenda} from "react-native-calendars"
 import {Ionicons} from "@expo/vector-icons";
 import {col} from './col';
 
@@ -9,16 +10,59 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            timeGridLeft: [
-                <TimeGrid key={99} nav = {this.props.navigation}/>
-            ],
-            days: [
+            calendar: [
 
             ],
+            days:[
+
+            ],
+            daysForView: [
+                new Date()
+            ],
             view:[
-                <DailyView key={98} day={20201222} nav = {this.props.navigation}/>,
+
             ]
         }
+    }
+    componentDidMount() {
+        console.log("Creating views for " + this.state.daysForView)
+        let view = []
+        let key = 0;
+        this.state.daysForView.forEach(day => {
+            view.push(
+                <DailyView key={key} day={day} nav = {this.props.navigation}/>
+                )
+            key++
+        })
+        console.log(view)
+        this.setState({view})
+    }
+
+    changeCalendarVisibility(setter) {
+
+            let calendar = []
+            if(setter === true) {
+                calendar.push(
+                    <TouchableOpacity style={styles.calendarLayer} onPress={() => {this.changeCalendarVisibility(false)}}
+                                                 key={"calendar"}>
+                    <Calendar style={styles.calendar} onDayPress={(day) => {
+                        this.changeDay(day)
+                    }}/>
+                </TouchableOpacity>)
+
+            }
+            else calendar.push(<View/>)
+            this.setState({calendar})
+
+
+    }
+    changeDay(day) {
+        let daysForView = []
+        daysForView.push(day.dateString)
+        console.log(daysForView)
+        this.setState({daysForView})
+        this.changeCalendarVisibility(false)
+        this.componentDidMount()
     }
     render() {
         return(
@@ -32,7 +76,11 @@ class Main extends React.Component {
                         <Ionicons name="md-options" style={styles.icon} size={32}/>
                     </TouchableOpacity>
                 </View>
-
+                {
+                    this.state.calendar.map(key => {
+                        return key
+                    })
+                }
                 {
                     this.state.days.map((key) => {
                         return key
@@ -40,6 +88,11 @@ class Main extends React.Component {
                 }
                 <View style={styles.ttContainer}>
                     <View style={styles.LeftBar} key={0}>
+                        <TouchableOpacity style={styles.timeGridBlock}  key={65} onPress={() => {
+                            this.changeCalendarVisibility(true)
+                        }}>
+                            <Ionicons name="md-calendar" style={styles.icon} size={32}/>
+                        </TouchableOpacity>
                         <TimeGrid/>
                     </View>
                     <View style={styles.smallTTContainer} key={1}>
@@ -57,8 +110,28 @@ class Main extends React.Component {
 }
 
 const styles = StyleSheet.create({
+    calendarLayer: {
+        position: "absolute",
+        zIndex: 99,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height
+    },
+    calendar: {
+        position:"absolute",
+        left:30,
+        top:20,
+        zIndex:100,
+    },
     dailyView: {
         flex:1,
+    },
+    timeGridBlock:{
+        borderColor: col.grey,
+        borderBottomWidth:0.5,
+        borderRightWidth:0.5,
+        flex:1,
+        flexDirection: "column",
+        justifyContent: "center",
     },
     header: {
         height:60,
