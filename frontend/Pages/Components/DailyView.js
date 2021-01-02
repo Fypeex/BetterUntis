@@ -1,6 +1,6 @@
 import {Text, TouchableOpacity, View, StyleSheet,Dimensions} from "react-native";
 import React,{Component} from "react";
-import {getDayTimeTable} from "../../backend/modules/getTimeTable";
+import {getDayTimeTable,readTTFromFile} from "../../backend/modules/getTimeTable";
 import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler";
 import {col} from '../col';
 import Lesson from "./Lesson"
@@ -64,7 +64,8 @@ export class DailyView extends Component{
             if(day === undefined) day = this.day
 
             //Get Timetable for in properties specified date
-            let timeTableData = await getDayTimeTable(day, session, school)
+            let timeTableData = await readTTFromFile()
+            //let timeTableData = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
 
             //Prepare array of lessons. This array only contains the Grid
@@ -72,176 +73,121 @@ export class DailyView extends Component{
                 lessons[k] = <View style={(k === lessons.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={(k+1) * 17}/>
             }
 
-            //Checks if Timetable fetch was success
+            let sortedLessons = []
             if(timeTableData !== 400) {
-                //If session timed out, get new session
+                console.log("Error?")
                 console.log(timeTableData.data.error)
-                if (timeTableData.data.error) {
-                    session = await getNewSession(school)
-                    if(session === null) this.props.nav.navigate("SchoolSearch")
-                    timeTableData = await getDayTimeTable(day, session, school)
 
+                if (timeTableData.data.error) {
+                    switch(timeTableData.data.error.code) {
+                        case -7004: //Date invalid/not allowed to view for this date
+                            console.log("Can't retrieve data for this date")
+                            return;
+                        default: //Session timeout
+                            session = await getNewSession(school)
+                            if (session === null) this.props.nav.navigate("SchoolSearch")
+                            timeTableData = await getDayTimeTable(day, session, school)
+                    }
                 }
 
-                //Specify the Daily time table
                 let dayTimeTable = timeTableData.data.result
+                dayTimeTable.forEach(lesson => {
+                    sortedLessons.push({
+                            startTime: lesson.startTime,
+                            endTime:lesson.endTime,
+                            id:lesson.id,
+                            data:lesson,
+                            lessonType:1,
+                        //lessonTypes:
+                        // 1 = singleLesson
+                        // 2 = doubleLesson
+                        // 0 = lesson to Remove
 
-                let entries = []
-
-                //Push every lesson from the data into a new object with easier access to their id and timegrid place
-                dayTimeTable.forEach(entry => {
-                    entries.push({
-                        hour:parseInt(entry.startTime),
-                        id: entry.su[0].id,
-                        entry:entry
-                    })
+                        })
                 })
-                //Sort the array of lessons so multiple lessons can be placed on one Timegrid place
-                let a = []
-                entries.forEach(entry => {
-                    a.push(entries.filter(entry2 => entry2.hour === entry.hour))
-                })
-                //Loop through all the lessons
-                for (let i = 0;i < a.length;i++) {
 
-                    //Style => Style of the lesson / what kind of lesson (Single, Solo / Double, Solo etc)
-                    let style;
+                for(let i = 0;i<sortedLessons.length;i++) {
+                    if(sortedLessons[i+1] === undefined) break
+                    if(sortedLessons[i].id === sortedLessons[i+1].id - 1) {
 
-                    //Inc is needed to increment I if a double lessons was found so they second lesson will get skipped
-                    let inc = 0
+                      sortedLessons[i].lessonType = 2
+                      sortedLessons[i].endTime = sortedLessons[i+1].endTime
 
-                    //This will only be done if a isnt at its last spot to prevent undefined variables
-                    if(a[i+1]) {
-                        style = []
-
-                        //Switch about the length of the timegrid array/How many lessons need to be placed into on grid field
-                        switch (a[i].length) {
-                            case 0:
-                                break;
-                            case 1:
-                                //This checks if the lesson is double or single
-                                if (a[i][0].id === a[i + 1][0].id) {
-
-                                    style.push(styles.multi)
-                                    inc = 1
-                                } else {
-                                    style.push(styles.single)
-                                }
-                                break;
-                            default:
-                                let l = a[i].length
-                                for (let f = 0; f < l; f++) {
-                                    if (a[i+1][f] && a[i][f].id === a[i + 1][f].id) {
-                                        style.push(styles.multi)
-                                        inc = 1
-                                    } else {
-                                        style.push(styles.multi)
-                                    }
-                                }
-                                break;
-                        }
-
-
-                        let component = []
-
-                        //Z => Temporary arr to store the multiple lesson blocks if there are multiple lessons per grid field
-                        let z =[]
-
-                        //Count => counts how often i gets manually incremented to subtract this later from another array
-                        let count = 0;
-
-                        //If there is only one lesson
-                        if (style.length === 1) {
-                            for (let q = 0; q < a[i].length; q++) {
-                                component.push(
-                                    <TouchableOpacity style={style} key={i} onPress={() => {
-                                        let touchedLesson = [
-                                            <View style={styles.touchedContainer}>
-                                                <TouchableOpacity
-                                                    style={[styles.touchedContainer, {left: 0}]}
-                                                    onPress={() => {
-                                                        let touchedLesson = []
-                                                        this.setState({touchedLesson})
-                                                    }}
-                                                    key = {0}
-                                                />
-                                                <View style={styles.touchedLesson} key={1}>
-                                                    <DetailedLessonPage info={a[i][0].entry}/>
-                                                </View>
-                                            </View>
-                                        ]
-                                        this.setState({touchedLesson})
-                                    }}>
-                                        <Lesson info={a[i][0].entry}/>
-                                    </TouchableOpacity>
-                                )
-                            }
-                        }else {
-                            let l = a[i].length
-
-                            for (let f = 0; f < l; f++) {
-                                if (a[i + 1][f] && a[i][f].id === a[i + 1][f].id) {
-                                    z.push(
-                                        <View style={styles.innerLesson} key={i * f * 23}>
-                                            <Text style={styles.lessonText}>{a[i][f].entry.subject}</Text>
-                                        </View>
-                                    )
-
-                                    count = 1
-                                    i++
-                                }
-
-
-                            }
-                            z.reverse()
-
-                            component = <View style={[{flex: 1, flexDirection: "row"}, style]}>
-                                {
-                                    z.map((key) => {
-                                        return key
-                                    })
-                                }
-                            </View>
-                        }
-
-                        //Place components
-                        for(let t =0; t < a[i].length;t++){
-                            let fil = grid.data.rows.filter(gridEntry => gridEntry.startTime === a[i][t].hour)
-                            lessons[fil[0].period-1-count] = component
-                        }
-
-                        for(let t =0; t < a[i].length;t++){
-                            let fil = grid.data.rows.filter(gridEntry => gridEntry.startTime === a[i][t].hour)
-                            lessons[fil[0].period-count] = <View key = {(i+1)*18}/>
-                        }
-
-
-                        i+=inc
-
+                      sortedLessons[i+1].lessonType = 0
                     }
 
                 }
 
+                sortedLessons.forEach(lesson => {
+                    if(lesson.lessonType === 0) {
+                        sortedLessons.splice(sortedLessons.indexOf(lesson),1)
+                    }
+                })
 
-            }
-
-            else {
-                alert("Error fetching timetable")
             }
 
             let rows = grid.data.rows
-            let endTime = 755
-            let s = 0;
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i].startTime === endTime) {
-                    endTime = rows[i].endTime
-                } else {
+            let allLessons = []
+            for(let i = 0; i<rows.length;i++) {
 
-                    lessons.splice(i + s, 0, <View style={styles.breakBlock}
-                                                   key={s * 20}/>)
-                    s++
-                    endTime = rows[i + 1].startTime
+                let lessonsForThisRow = []
+                sortedLessons.forEach(lesson => {
+                    if(lesson.startTime === rows[i].startTime) lessonsForThisRow.push(lesson)
+                })
+                allLessons.push(lessonsForThisRow)
+            }
+            let key = 50
+            let innerKey = 1;
+            for(let i = 0; i<lessons.length; i++) {
+
+                let renderedLessonsForThisLesson = []
+                let size = 1
+                let lessonComponent = []
+
+                allLessons[i].forEach(lesson => {
+                    renderedLessonsForThisLesson.push(lesson)
+                    size = lesson.lessonType
+                })
+
+                renderedLessonsForThisLesson.forEach(lesson => {
+                    innerKey++
+                    lessonComponent.push(
+                        <TouchableOpacity style={styles.lesson} key={i + innerKey} onPress={() => {
+                            let touchedLesson = [
+                                <View style={styles.touchedContainer} >
+                                    <TouchableOpacity
+                                        style={[styles.touchedContainer, {left: 0}]}
+                                        onPress={() => {
+                                            let touchedLesson = []
+                                            this.setState({touchedLesson})
+                                        }}
+                                        key = {0}
+                                    />
+                                    <View style={styles.touchedLesson} key={1}>
+                                        <DetailedLessonPage info={lesson.data}/>
+                                    </View>
+                                </View>
+                            ]
+                            this.setState({touchedLesson})
+                        }}>
+                            <Lesson info={lesson.data}/>
+                        </TouchableOpacity>
+                    )
+                })
+                key++
+                lessons[i] = <View style = {[styles.timeGridBlock,{flex:size}]} key={key}>
+                    {
+                        lessonComponent.map(key => {
+                            return key
+                        })
+                    }
+                </View>
+
+                if(size === 2) {
+                    lessons[i+1] = <View key = {key*2}/>
+                    i++
                 }
+
             }
 
             this.setState({lessons})
@@ -286,7 +232,6 @@ const styles = StyleSheet.create({
     touchedContainer:{
         position: "absolute",
         left:-60,
-        backgroundColor:"rgba(255,255,255,0.01),",
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height-60,
         justifyContent:"center",
@@ -295,11 +240,11 @@ const styles = StyleSheet.create({
     },
     touchedLesson: {
         zIndex : 10,
-        backgroundColor:"white",
         width:250,
         height: 450,
     },
     lesson: {
+        flexDirection:"row",
         backgroundColor: col.accentDark,
         borderRadius:3,
         margin:5,
@@ -343,6 +288,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 0.5,
     },
     timeGridBlock:{
+        flexDirection: "row",
         backgroundColor: col.secbg,
         borderColor: col.grey,
         borderTopWidth: 0.5,

@@ -1,6 +1,8 @@
 //Author: Felix Jungbluth
 //function to export timetable data
 const axios = require("axios")
+import tt from "./test"
+import * as FileSystem from 'expo-file-system';
 
 
 exports.getTimeTable = async function fetchData(url) {
@@ -21,7 +23,9 @@ exports.getTimeTable = async function fetchData(url) {
         console.log("Error fetching TimeTable for week " + today)
     })
 }
-
+exports.readTTFromFile = () => {
+    return tt.tt
+}
 exports.getDayTimeTable = (day,session,school) => {
     console.log("TimeTable")
     console.log(`${school.serverUrl.split("?")[0]}/api/daytimetable/dayLesson?date=${day}&id=${session.personId}&type=${session.personType}`)
