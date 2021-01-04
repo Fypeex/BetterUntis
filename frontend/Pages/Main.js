@@ -5,6 +5,7 @@ import {TimeGrid} from "./Components/TimeGrid"
 import {Calendar, CalendarList,Agenda} from "react-native-calendars"
 import {Ionicons} from "@expo/vector-icons";
 import {col} from './col';
+import Day from "react-native-calendars/src/calendar/day";
 
 class Main extends React.Component {
     constructor(props) {
@@ -17,25 +18,11 @@ class Main extends React.Component {
 
             ],
             daysForView: [
-                new Date()
             ],
             view:[
-
+                <DailyView key={0} day={new Date().toISOString().split('T')[0].replace("-", "").replace("-", "")}/>
             ]
         }
-    }
-    componentDidMount() {
-        console.log("Creating views for " + this.state.daysForView)
-        let view = []
-        let key = 0;
-        this.state.daysForView.forEach(day => {
-            view.push(
-                <DailyView key={key} day={day} nav = {this.props.navigation}/>
-                )
-            key++
-        })
-        console.log(view)
-        this.setState({view})
     }
 
     changeCalendarVisibility(setter) {
@@ -51,7 +38,7 @@ class Main extends React.Component {
                 </TouchableOpacity>)
 
             }
-            else calendar.push(<View/>)
+            else calendar.push(<View key={"CalendarInvisible"}/>)
             this.setState({calendar})
 
 
@@ -59,10 +46,17 @@ class Main extends React.Component {
     changeDay(day) {
         let daysForView = []
         daysForView.push(day.dateString)
-        console.log(daysForView)
         this.setState({daysForView})
+
+        let view = []
+
+        daysForView.forEach(day =>  {
+            let date = day.split("-")[0]+day.split("-")[1]+day.split("-")[2]
+            view.push(<DailyView key={date} day={date}/>)
+
+        })
+        this.setState({view})
         this.changeCalendarVisibility(false)
-        this.componentDidMount()
     }
     render() {
         return(

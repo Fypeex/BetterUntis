@@ -8,7 +8,6 @@ import DetailedLessonPage from "./DetailedLessonPage"
 export class DailyView extends Component{
     constructor(props) {
         super(props);
-        this.day = this.props.day
 
         this.state = {
             days:[],
@@ -19,14 +18,10 @@ export class DailyView extends Component{
     }
 
     renderDays() {
-        let day = this.props.day
-        let date
+        let date = this.props.day
 
-        if(day === undefined) {date = this.date}
-        else{date = day.toString().substr(4,2)+"/"+day.toString().substr(6,2)+"/"+ day.toString().substr(0,4)}
-
-        let topDate = date.split("/")[1]+"/"+date.split("/")[0]
-        let botDate = new Date(date).toString().split(" ")[0]
+        let topDate = date
+        let botDate = date
 
         let days = []
         days.push(
@@ -61,11 +56,10 @@ export class DailyView extends Component{
             //Get Timegrid for school
             let grid = await getGrid(school)
             let day = this.props.day
-            if(day === undefined) day = this.day
 
             //Get Timetable for in properties specified date
-            let timeTableData = await readTTFromFile()
-            //let timeTableData = await getDayTimeTable(day, session, school)
+            //let timeTableData = await readTTFromFile()
+            let timeTableData = await getDayTimeTable(day, session, school)
             let lessons = new Array(grid.data.rows.length)
 
             //Prepare array of lessons. This array only contains the Grid
@@ -152,7 +146,7 @@ export class DailyView extends Component{
                 renderedLessonsForThisLesson.forEach(lesson => {
                     innerKey++
                     lessonComponent.push(
-                        <TouchableOpacity style={styles.lesson} key={i + innerKey} onPress={() => {
+                        <TouchableOpacity style={styles.lesson} key={lesson} onPress={() => {
                             let touchedLesson = [
                                 <View style={styles.touchedContainer} >
                                     <TouchableOpacity
@@ -197,7 +191,7 @@ export class DailyView extends Component{
                 } else {
 
                     lessons.splice(i + s, 0, <View style={styles.breakBlock}
-                                                   key={s * 20}/>)
+                                                   key={s * 200}/>)
                     s++
                     endTime = rows[i + 1].startTime
                 }
