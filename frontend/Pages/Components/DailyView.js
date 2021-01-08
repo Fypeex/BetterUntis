@@ -69,8 +69,6 @@ export class DailyView extends Component{
 
             let sortedLessons = []
             if(timeTableData !== 400) {
-                console.log("Error?")
-                console.log(timeTableData.data.error)
 
                 if (timeTableData.data.error) {
                     switch(timeTableData.data.error.code) {
@@ -146,7 +144,7 @@ export class DailyView extends Component{
                 renderedLessonsForThisLesson.forEach(lesson => {
                     innerKey++
                     lessonComponent.push(
-                        <TouchableOpacity style={styles.lesson} key={lesson} onPress={() => {
+                        <TouchableOpacity style={styles.lesson} key={lesson + innerKey} onPress={() => {
                             let touchedLesson = [
                                 <View style={styles.touchedContainer} >
                                     <TouchableOpacity

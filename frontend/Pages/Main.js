@@ -20,9 +20,18 @@ class Main extends React.Component {
             daysForView: [
             ],
             view:[
-                <DailyView key={0} day={new Date().toISOString().split('T')[0].replace("-", "").replace("-", "")}/>
             ]
         }
+    }
+    async componentDidMount() {
+        let view = []
+        let lastDay = JSON.parse(await AsyncStorage.getItem("lastViewedDay"))
+        if(lastDay === null || lastDay === undefined) lastDay = new Date().toISOString().split('T')[0].replace("-", "").replace("-", "")
+        console.log("LAST DAY")
+        console.log(lastDay)
+        view.push(<DailyView key={0} day={lastDay}/>)
+
+        this.setState({view})
     }
 
     changeCalendarVisibility(setter) {
@@ -53,8 +62,9 @@ class Main extends React.Component {
         daysForView.forEach(day =>  {
             let date = day.split("-")[0]+day.split("-")[1]+day.split("-")[2]
             view.push(<DailyView key={date} day={date}/>)
-
+            AsyncStorage.setItem("lastViewedDay",JSON.stringify(date))
         })
+
         this.setState({view})
         this.changeCalendarVisibility(false)
     }
@@ -85,7 +95,7 @@ class Main extends React.Component {
                         <TouchableOpacity style={styles.timeGridBlock}  key={65} onPress={() => {
                             this.changeCalendarVisibility(true)
                         }}>
-                            <Ionicons name="md-calendar" style={styles.icon} size={32}/>
+                            <Ionicons name="md-calendar" style={[styles.icon,{paddingBottom:15}]} size={32}/>
                         </TouchableOpacity>
                         <TimeGrid/>
                     </View>

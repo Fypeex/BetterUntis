@@ -25,6 +25,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.4.tar.gz",
     "react-native-analog-clock": "^0.3.1",
     "react-native-calendars": "^1.1129.0",
+    "react-native-dialog": "^6.1.2",
     "react-native-gesture-handler": "~1.7.0",
     "react-native-mask-loader": "0.0.3",
     "react-native-navigation": "^7.6.0",
