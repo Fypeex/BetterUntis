@@ -20,7 +20,7 @@ export class TimeGrid extends React.Component {
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].startTime === endTime) {
                 timeGridLeft.push(
-                    <View style={(i === rows.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={endTime}>
+                    <View style={styles.timeGridBlock} key={endTime}>
                         <Text key={0} style={[styles.startTime,styles.text]}> {rows[i].startTime}</Text>
                         <Text key={1} style={[styles.periodNumber,styles.text]}> {rows[i].period}</Text>
                         <Text key={2} style={[styles.endTime,styles.text]}> {rows[i].endTime}</Text>
@@ -74,20 +74,16 @@ const styles = StyleSheet.create({
 
     breakBlock: {
         height:15,
-        borderBottomWidth: 0.5,
+        marginBottom:-0.167,
+        borderBottomWidth: 0.167,
         borderRightWidth:0.5,
         borderColor: col.grey,
     },
     timeGridBlock:{
+        marginTop:-0.167,
+        marginBottom:-0.167,
         borderColor: col.grey,
-        borderBottomWidth:0.5,
-        borderRightWidth:0.5,
-        flex:1,
-        flexDirection: "column",
-        justifyContent: "center",
-    },
-    timeGridBlockBorder:{
-        borderColor: col.grey,
+        borderBottomWidth:0.167,
         borderRightWidth:0.5,
         flex:1,
         flexDirection: "column",

@@ -2,7 +2,6 @@ import React,{Component} from "react";
 import {View,Text,StyleSheet,TouchableOpacity,TextInput,AsyncStorage} from "react-native"
 import {col} from "../col"
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import Dialog from "react-native-dialog";
 export default class DetailedLessonPage extends Component {
     constructor(props) {
@@ -153,7 +152,6 @@ export default class DetailedLessonPage extends Component {
 
         let storedHW = JSON.parse(await AsyncStorage.getItem("customHomework"))
         storedHW.find(hw => hw.id === this.state.lessonInformation.id).hw[storedHW.find(hw => hw.id === this.state.lessonInformation.id).hw.findIndex(element => element.id === id)].Homework = text
-        console.log(storedHW)
         await AsyncStorage.setItem("customHomework",JSON.stringify(storedHW))
 
         await this.componentDidMount()

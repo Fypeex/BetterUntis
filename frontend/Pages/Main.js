@@ -1,11 +1,13 @@
 import React from "react"
-import {AsyncStorage, Dimensions, StatusBar, StyleSheet, TouchableOpacity, View} from "react-native";
+import {AsyncStorage, Dimensions, StatusBar, StyleSheet, TouchableOpacity, View,Animated,Easing} from "react-native";
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
 import {Calendar} from "react-native-calendars"
-import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import {Ionicons, MaterialIcons,FontAwesome} from "@expo/vector-icons";
 import {col} from './col';
 import {LinearGradient} from "expo-linear-gradient";
+import {getDayTimeTable} from "../backend/modules/getTimeTable";
+import {getGrid, getNewSession, getSchool, getSession} from "./StorageHandler";
 
 class Main extends React.Component {
     constructor(props) {
@@ -21,19 +23,48 @@ class Main extends React.Component {
             ],
             view:[
             ],
+            spinValue:new Animated.Value(0),
             icon:[
                 <MaterialIcons key={"viewday"} name={"view-day"} size={32} color={"darkgray"}/>
             ],
+            popup:[
+            ],
+            popupshown:false,
             iconTheme:"",
             selectedDay:"",
         }
     }
     async componentDidMount() {
+        let popup = [
+            <LinearGradient
+                colors={["rgb(30,30,30)", "rgb(15,15,15)"]}
+                start={[-0.66,0]}
+                style={styles.spinner}
+                key={"gradient"}>
+                <Animated.View style={{transform:[{rotate:this.state.spinValue.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: ['0deg', '360deg']
+                        })}]}}>
+                    <FontAwesome color={"white"} key={"spinner"} name={"spinner"} size={50} contentStyle={{backgroundColor: "rgba(1,1,1,0)"}}/>
+                </Animated.View>
+            </LinearGradient>
+        ]
+        this.setState({popup})
+        Animated.timing(
+            this.state.spinValue,
+            {
+                toValue: 1,
+                duration: 3000,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
         this.state.selectedDay = JSON.parse(await AsyncStorage.getItem("lastViewedDay"))
         let iconTheme = await AsyncStorage.getItem("iconTheme")
         if(iconTheme === null) iconTheme = "day"
         this.setState({iconTheme})
-        let view = (this.state.iconTheme === "day")? this.renderDay(this.state.selectedDay):this.renderWeek(this.state.selectedDay)
+        await this.switchIcon()
+        let view = (this.state.iconTheme === "day")? await this.renderDay(this.state.selectedDay):await this.renderWeek(this.state.selectedDay)
         this.setState({view})
     }
 
@@ -44,8 +75,8 @@ class Main extends React.Component {
                 calendar.push(
                     <TouchableOpacity style={styles.calendarLayer} onPress={() => {this.changeCalendarVisibility(false)}}
                                                  key={"calendar"}>
-                    <Calendar style={styles.calendar} onDayPress={(day) => {
-                        this.changeDay(day)
+                    <Calendar firstDay={1} style={styles.calendar} onDayPress={async (day) => {
+                        await this.changeDay(day)
                     }}/>
                 </TouchableOpacity>)
 
@@ -55,13 +86,47 @@ class Main extends React.Component {
 
 
     }
-    renderDay(day) {
+    async getTimeTable(day) {
+
+        let school = await getSchool()
+        if (school === null) {
+            this.props.nav.navigate("SchoolSearch")
+            return
+        }
+
+
+        let session = await getSession()
+        if (session === null) {
+            this.props.nav.navigate("SchoolSearch")
+            return
+        }
+
+        let grid = await getGrid(school)
+
+        let timeTableData = await getDayTimeTable(day, session, school)
+        if(timeTableData.error || timeTableData === 400) return [grid,400]
+        if (timeTableData.data.isSessionTimeout) {
+            session = await getNewSession(school)
+            if (session === null) this.props.nav.navigate("SchoolSearch")
+            timeTableData = await getDayTimeTable(day, session, school)
+
+        }
+
+        return [grid,timeTableData]
+    }
+    async renderDay(day) {
+        this.setState({popupshown:true})
+
         day = day.dateString
         if(day === undefined) day = new Date(Date.now()).toISOString().split("T")[0]
         let date = day.split("-")[0]+day.split("-")[1]+day.split("-")[2]
-        return [<DailyView key={date} day={date}/>]
+        let data = await this.getTimeTable(date)
+        if(!data) return []
+        this.setState({popupshown:false})
+        return [<DailyView key={date} day={date} timeTable={data[1]} grid={data[0]} x={0} />]
     }
-    renderWeek(day) {
+    async renderWeek(day) {
+        this.setState({popupshown:true})
         let today = new Date(day.timestamp)
         let week = []
         for(let i=0;i<5;i++) {
@@ -69,22 +134,35 @@ class Main extends React.Component {
             week.push(new Date(today - ((today.getDay() - 1 - i) * 86400000)).toISOString().split("T")[0].replace("-","").replace("-",""))
 
         }
-        console.log(week)
         let view = []
-        week.forEach(date => {
-            view.push(<DailyView key={date} day={date}/>)
-        })
+        let x= 0
+        for(const date of week) {
 
+            let data = await this.getTimeTable(date)
+            if(!data) return []
+            view.push(<DailyView key={date} day={date} timeTable={data[1]} grid={data[0]} x={x}/>)
+            x++
+        }
+        this.setState({popupshown:false})
         return view
     }
-    changeDay(day) {
+    async changeDay(day) {
         this.state.selectedDay = day
-        AsyncStorage.setItem("lastViewedDay",JSON.stringify(day))
+        AsyncStorage.setItem("lastViewedDay", JSON.stringify(day))
         this.changeCalendarVisibility(false)
 
-        let view = (this.state.iconTheme === "day")? this.renderDay(day):this.renderWeek(day)
+        let view = (this.state.iconTheme === "day") ? await this.renderDay(day) : await this.renderWeek(day)
         this.setState({view})
 
+    }
+    async switchIcon() {
+        let icon = (this.state.iconTheme === "week")?
+            [<MaterialIcons key={"viewday"} name={"view-day"} size={32} color={"darkgray"}/>]
+            :
+            [<MaterialIcons key={"viewweek"} name={"view-week"} size={32} color={"darkgray"}/>]
+
+
+        this.setState({icon})
     }
     render() {
         return(
@@ -123,6 +201,11 @@ class Main extends React.Component {
                                 return key
                             })
                         }
+                        {
+                            this.state.popupshown? this.state.popup.map((key) => {
+                                return key
+                            }): this.state.popup.map((key) => {})
+                        }
                     </View>
 
                 </View>
@@ -133,16 +216,10 @@ class Main extends React.Component {
                         style={styles.buttonTrayBottom}>
                     <TouchableOpacity onPress = {async () => {
 
-                        let icon = (this.state.iconTheme === "week")?
-                            [<MaterialIcons key={"viewday"} name={"view-day"} size={32} color={"darkgray"}/>]
-                            :
-                            [<MaterialIcons key={"viewweek"} name={"view-week"} size={32} color={"darkgray"}/>]
-
-
-                        this.setState({icon})
+                        await this.switchIcon()
                         this.state.iconTheme = (this.state.iconTheme === "day") ? "week" : "day"
 
-                        let view = (this.state.iconTheme === "day")? this.renderDay(this.state.selectedDay):this.renderWeek(this.state.selectedDay)
+                        let view = (this.state.iconTheme === "day")? await this.renderDay(this.state.selectedDay):await this.renderWeek(this.state.selectedDay)
                         this.setState({view})
 
                         await AsyncStorage.setItem("iconTheme",(this.state.iconTheme === "day") ? "day" : "week")
@@ -185,9 +262,17 @@ const styles = StyleSheet.create({
     dailyView: {
         flex:1,
     },
+    spinner:{
+        position:"absolute",
+        left: "40%",
+        top: "40%",
+        padding:15,
+        borderRadius:25,
+    },
     timeGridBlock:{
         borderColor: col.grey,
-        borderBottomWidth:0.5,
+        marginBottom:-0.167,
+        borderBottomWidth:0.167,
         borderRightWidth:0.5,
         flex:1,
         flexDirection: "column",

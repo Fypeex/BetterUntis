@@ -1,7 +1,6 @@
 import {Text, TouchableOpacity, View, StyleSheet,Dimensions} from "react-native";
 import React,{Component} from "react";
-import {getDayTimeTable,readTTFromFile} from "../../backend/modules/getTimeTable";
-import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler";
+
 import {col} from '../col';
 import Lesson from "./Lesson"
 import DetailedLessonPage from "./DetailedLessonPage"
@@ -40,42 +39,17 @@ export class DailyView extends Component{
         if (!this.state.lessonsRendered) {
 
 
-            //Get school date from AsynStorage
-            let school = await getSchool()
-            if(school=== null) {
-                this.props.nav.navigate("SchoolSearch")
-                return
-            }
-
-            //Get session from AsyncStorage, if timed out, get new session. If no username/passwor navigate to login
-            let session = await getSession()
-            if(session === null) {
-                this.props.nav.navigate("SchoolSearch")
-                return
-            }
-
-            //Get Timegrid for school
-            let grid = await getGrid(school)
-            let day = this.props.day
-
-            //Get Timetable for in properties specified date
-            //let timeTableData = await readTTFromFile()
-            let timeTableData = await getDayTimeTable(day, session, school)
+            //Get school date from AsyncStorage
+            let grid = this.props.grid
+            let timeTableData = this.props.timeTable
             let lessons = new Array(grid.data.rows.length)
-
             //Prepare array of lessons. This array only contains the Grid
             for (let k = 0; k < lessons.length; k++) {
-                lessons[k] = <View style={(k === lessons.length-1) ? styles.timeGridBlockBorder: styles.timeGridBlock} key={(k+1) * 17}/>
+                lessons[k] = <View style={styles.timeGridBlock} key={(k+1) * 17}/>
             }
 
             let sortedLessons = []
             if(timeTableData !== 400) {
-                if (timeTableData.data.isSessionTimeout) {
-                            session = await getNewSession(school)
-                            if (session === null) this.props.nav.navigate("SchoolSearch")
-                            timeTableData = await getDayTimeTable(day, session, school)
-
-                }
 
                 let dayTimeTable = timeTableData.data.data.dayTimeTable
                 dayTimeTable.forEach(lesson => {
@@ -147,7 +121,7 @@ export class DailyView extends Component{
                     lessonComponent.push(
                         <TouchableOpacity style={[styles.lesson,{backgroundColor:lesson.data.backColor+"1f"}]} key={lesson + innerKey} onPress={() => {
                             let touchedLesson = [
-                                <View style={styles.touchedContainer}>
+                                <View style={[styles.touchedContainer,{left:(this.props.x + 1) * -60}]} key={"TouchedLesson"}>
                                     <TouchableOpacity
                                         style={[styles.touchedContainer, {left: 0}]}
                                         onPress={() => {
@@ -237,7 +211,6 @@ export class DailyView extends Component{
 const styles = StyleSheet.create({
     touchedContainer:{
         position: "absolute",
-        left:0,
         right:0,
         width: Dimensions.get('screen').width,
         height: Dimensions.get('screen').height-60,
@@ -247,7 +220,7 @@ const styles = StyleSheet.create({
     },
     touchedLesson: {
         position: "absolute",
-        left:0,
+        left:60,
         zIndex : 10,
         width:250,
         height: 450,
@@ -291,34 +264,19 @@ const styles = StyleSheet.create({
         margin:3,
     },
     breakBlock: {
+        margin:-0.167,
         backgroundColor: col.secbg,
         height:15,
         borderColor: col.grey,
-        borderTopWidth: 0.5,
+        borderWidth: 0.167,
     },
     timeGridBlock:{
+        margin:-0.167,
         flexDirection: "row",
         backgroundColor: col.secbg,
         borderColor: col.grey,
-        borderTopWidth: 0.5,
         flex:1,
-    },
-    multi:{
-        borderColor: col.grey,
-        borderTopWidth: 0.5,
-        flex:2,
-    },
-    single: {
-        borderColor: col.grey,
-        borderTopWidth: 0.5,
-        flex:1,
-    },
-    timeGridBlockBorder:{
-        backgroundColor: col.secbg,
-        flex:1,
-        borderTopWidth: 0.5,
-        borderColor: col.grey,
-        borderBottomRightRadius:6,
+        borderWidth:0.167,
     },
     lessonthingy:{
         color: col.white
