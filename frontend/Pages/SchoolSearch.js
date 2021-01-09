@@ -10,12 +10,8 @@ import {
     ActivityIndicator,
     StatusBar
 } from 'react-native';
-import {useCardAnimation} from "@react-navigation/stack";
-import {ScrollView} from "react-native-web";
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
-import { isLoaded } from 'expo-font';
-import { Font } from 'expo';
 const ss = require("../backend/modules/schoolSearch")
 const l = require("../backend/modules/accountHandling")
 
@@ -74,10 +70,10 @@ class SchoolSearch extends React.Component {
                     start={[-0.66,0]}
                     style={styles.gradient}>
                 
-                <View style = {styles.header}></View>
+                <View style = {styles.header}/>
                 <View style={styles.button}>
-                    <TextInput style={styles.input} placeholderTextColor = "rgb(150,150,150)" placeholder='Search for your school' onChangeText={(text) => {
-                        this.addTextInput(this.state.textInput.length,text)
+                    <TextInput style={styles.input} placeholderTextColor = "rgb(150,150,150)" placeholder='Search for your school' onChangeText={async (text) => {
+                        await this.addTextInput(this.state.textInput.length,text)
                     }
                     }
                     />
@@ -134,7 +130,6 @@ const styles = StyleSheet.create({
     input:{
         fontSize:20,
         color: styleVars.whiteColor,
-        //fontFamily: "Raleway",
     },
     searchError: {
         textAlign:"center",
