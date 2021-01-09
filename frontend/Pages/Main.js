@@ -128,7 +128,7 @@ class Main extends React.Component {
                 </View>
                 <View style={styles.buttonTrayBottom}>
                     <LinearGradient
-                        colors={["rgb(60,60,60)", "rgb(15,15,15)"]}
+                        colors={["rgb(30,30,30)", "rgb(15,15,15)"]}
                         start={[-0.66,0]}
                         style={styles.buttonTrayBottom}>
                     <TouchableOpacity onPress = {async () => {
@@ -207,6 +207,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flex:1,
         borderRadius:3,
+        margin: 6,
     },
     smallTTContainer: {
         backgroundColor: col.secbg,

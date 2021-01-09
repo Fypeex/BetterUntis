@@ -255,8 +255,9 @@ const styles = StyleSheet.create({
     lesson: {
         flexDirection:"row",
         borderRadius:10,
-        margin:1,
+        margin:3,
         flex:1,
+        
     },
     lessonInfo:{
         color: col.white,

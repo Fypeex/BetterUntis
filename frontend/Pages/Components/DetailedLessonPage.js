@@ -165,15 +165,18 @@ export default class DetailedLessonPage extends Component {
             <View style={styles.container} key={2}>
                 <View style={styles.containerHeader} key={"Header"}>
                     <Text key={"HeaderDate"} style={styles.headerDate}>{new Date(this.state.lessonInformation.lessonDate).toString().split(" ")[0]} | {this.state.lessonInformation.lessonDateFormatted}</Text>
-                    <Text key={"HeaderStartTime"} style={styles.headerStarttime}>{this.props.info.startTime}</Text>
-                    <Text key={"HeaderEndTime"} style={styles.headerEndtime}>{this.props.info.endTime}</Text>
+                    <View style={styles.headerTimeContainer} key={"HeaderTime"}>
+                        <Text key={"HeaderStartTime"} style={styles.headerStarttime}>{this.props.info.startTime}</Text>
+                        <Text key={"HeaderConnector"} style={styles.headerConnector}>-</Text>
+                        <Text key={"HeaderEndTime"} style={styles.headerEndtime}>{this.props.info.endTime}</Text>
+                    </View>
                 </View>
                 <View style={styles.lessonInfo}>
-                    <Text>
-                        {this.state.lessonInformation.subject}
+                    <Text style={styles.detailedSubject}>
+                        {"Subject: " + this.state.lessonInformation.subject}
                     </Text>
-                    <Text>
-                        {this.state.lessonInformation.teacher}
+                    <Text style={styles.detailedTeacher}>
+                        {"Teacher: " + this.state.lessonInformation.teacher}
                     </Text>
                 </View>
                 <View>
@@ -224,20 +227,36 @@ const styles = StyleSheet.create({
     },
     container: {
         flex:1,
-        backgroundColor:"grey",
-        borderRadius:20
+        backgroundColor:"#898989",
+        borderRadius:10
     },
     containerHeader: {
-        borderTopLeftRadius:20,
-        borderTopRightRadius:20,
-        flex:0.14,
-        backgroundColor: col.headerCol
+        borderTopLeftRadius:10,
+        borderTopRightRadius:10,
+        flex:0.2,
+        backgroundColor: col.headerCol,
+        justifyContent: "center",
+        alignItems: "center",
     },
     headerDate: {
         color: col.white,
         textAlign:"center",
         margin:"auto",
         fontSize:20,
+    },
+    headerTimeContainer:{
+        flexDirection: "row"
+    },
+    headerConnector:{
+        color: col.white
+    },
+    headerStarttime:{
+        color: col.white,
+        marginRight: 5
+    },
+    headerEndtime:{
+        color: col.white,
+        marginLeft: 5,
     },
     icon:{
         position:"relative",
@@ -247,13 +266,31 @@ const styles = StyleSheet.create({
         alignItems:"flex-end"
     },
     customHomework: {
-        flex:0.1,
-        backgroundColor:"white",
+        backgroundColor:"#dbdbdb",
         justifyContent:"center",
+        margin:3,
+        padding:3,
+        borderRadius:2,
+        overflow: "scroll",
     },
     customHomeworkContainer: {
-        flex:1,
+        flex: 1,
         justifyContent: "flex-start",
-        backgroundColor:"grey",
+        backgroundColor:"#898989",
+    },
+    lessonInfo:{
+        backgroundColor: col.secbg,
+        marginTop: 3,
+        borderRadius: 2,
+        margin:3,
+        padding: 3
+    },
+    detailedSubject:{
+        color: col.white,
+        fontSize: 16
+    },
+    detailedTeacher:{
+        color: col.white,
+        fontSize: 16
     }
 })

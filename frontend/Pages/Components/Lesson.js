@@ -30,6 +30,16 @@ const styles = StyleSheet.create({
     innerLesson: {
         flex:1,
         backgroundColor:col.accent,
-        borderRadius:10,
+        textAlign: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius:7.5,
+        overflow: "hidden"
+        
     },
+    lessonText:{
+        color: col.secbg,
+        fontSize: 16,
+        textAlign: "center",
+    }
 })
