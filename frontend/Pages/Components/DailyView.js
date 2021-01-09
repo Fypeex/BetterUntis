@@ -15,6 +15,7 @@ export class DailyView extends Component{
             touchedLesson:[],
             lessonsRendered:false
         }
+
     }
 
     renderDays() {
@@ -69,25 +70,19 @@ export class DailyView extends Component{
 
             let sortedLessons = []
             if(timeTableData !== 400) {
-
-                if (timeTableData.data.error) {
-                    switch(timeTableData.data.error.code) {
-                        case -7004: //Date invalid/not allowed to view for this date
-                            console.log("Can't retrieve data for this date")
-                            return;
-                        default: //Session timeout
+                if (timeTableData.data.isSessionTimeout) {
                             session = await getNewSession(school)
                             if (session === null) this.props.nav.navigate("SchoolSearch")
                             timeTableData = await getDayTimeTable(day, session, school)
-                    }
+
                 }
 
-                let dayTimeTable = timeTableData.data.result
+                let dayTimeTable = timeTableData.data.data.dayTimeTable
                 dayTimeTable.forEach(lesson => {
                     sortedLessons.push({
                             startTime: lesson.startTime,
                             endTime:lesson.endTime,
-                            id:lesson.id,
+                            id:lesson.lesson.id,
                             data:lesson,
                             lessonType:1,
                         //lessonTypes:
@@ -99,13 +94,19 @@ export class DailyView extends Component{
                 })
 
                 for(let i = 0;i<sortedLessons.length;i++) {
-                    if(sortedLessons[i+1] === undefined) break
-                    if(sortedLessons[i].id === sortedLessons[i+1].id - 1) {
+                    if(!sortedLessons[i+1])break;
+                    if(sortedLessons.filter(el => el.id === sortedLessons[i].id).length > 1) {
 
                       sortedLessons[i].lessonType = 2
                       sortedLessons[i].endTime = sortedLessons[i+1].endTime
 
                       sortedLessons[i+1].lessonType = 0
+                    }
+                    if(sortedLessons[i].data.timeGridHour.indexOf(" - ") > -1) {
+                        let hour =  sortedLessons[i].data.timeGridHour
+                        sortedLessons[i].data.timeGridHour = hour.split(" - ")[0]
+                        sortedLessons[i+1].data.timeGridHour = hour.split(" -")[1]
+
                     }
 
                 }
@@ -124,7 +125,7 @@ export class DailyView extends Component{
 
                 let lessonsForThisRow = []
                 sortedLessons.forEach(lesson => {
-                    if(lesson.startTime === rows[i].startTime) lessonsForThisRow.push(lesson)
+                    if(parseInt(lesson.data.timeGridHour) === parseInt(rows[i].period)) lessonsForThisRow.push(lesson)
                 })
                 allLessons.push(lessonsForThisRow)
             }
@@ -144,9 +145,9 @@ export class DailyView extends Component{
                 renderedLessonsForThisLesson.forEach(lesson => {
                     innerKey++
                     lessonComponent.push(
-                        <TouchableOpacity style={styles.lesson} key={lesson + innerKey} onPress={() => {
+                        <TouchableOpacity style={[styles.lesson,{backgroundColor:lesson.data.backColor+"1f"}]} key={lesson + innerKey} onPress={() => {
                             let touchedLesson = [
-                                <View style={styles.touchedContainer} >
+                                <View style={styles.touchedContainer}>
                                     <TouchableOpacity
                                         style={[styles.touchedContainer, {left: 0}]}
                                         onPress={() => {
@@ -204,6 +205,7 @@ export class DailyView extends Component{
     async componentDidMount() {
         await this.renderDays()
         await this.renderLessons();
+        
     }
 
     render() {
@@ -235,23 +237,25 @@ export class DailyView extends Component{
 const styles = StyleSheet.create({
     touchedContainer:{
         position: "absolute",
-        left:-60,
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height-60,
+        left:0,
+        right:0,
+        width: Dimensions.get('screen').width,
+        height: Dimensions.get('screen').height-60,
         justifyContent:"center",
         alignItems:"center",
         zIndex: 9
     },
     touchedLesson: {
+        position: "absolute",
+        left:0,
         zIndex : 10,
         width:250,
         height: 450,
     },
     lesson: {
         flexDirection:"row",
-        backgroundColor: col.accentDark,
-        borderRadius:3,
-        margin:5,
+        borderRadius:10,
+        margin:1,
         flex:1,
     },
     lessonInfo:{

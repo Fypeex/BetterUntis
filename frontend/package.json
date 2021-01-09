@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
+    "@material-ui/icons": "^4.11.2",
     "@react-navigation/drawer": "^5.11.4",
     "expo-permissions": "^10.0.0",
     "frisby": "^2.1.3",

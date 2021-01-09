@@ -6,12 +6,12 @@ export default class Lesson extends Component {
         super(props);
         this.state = {
             lessonInformation: {
-                class: this.props.info.kl,
-                teacher: this.props.info.te,
-                subject: this.props.info.su,
-                room: this.props.ro,
+                class: this.props.info.klasse,
+                teacher: this.props.info.teacher,
+                subject: this.props.info.subject,
+                room: this.props.rooom,
                 lessonDate: this.props.info.date,
-                id: this.props.info.id,
+                id: this.props.info.lesson.id,
             },
 
 
@@ -19,8 +19,8 @@ export default class Lesson extends Component {
     }
     render() {
         return (
-            <View style={styles.innerLesson}>
-                <Text style={styles.lessonText}>{this.state.lessonInformation.subject[0].longname}</Text>
+            <View style={[styles.innerLesson,{backgroundColor:this.props.info.backColor+"bf"}]}>
+                <Text style={styles.lessonText}>{this.state.lessonInformation.subject}</Text>
             </View>
         )
     }
@@ -30,6 +30,6 @@ const styles = StyleSheet.create({
     innerLesson: {
         flex:1,
         backgroundColor:col.accent,
-        margin:5,
+        borderRadius:10,
     },
 })
