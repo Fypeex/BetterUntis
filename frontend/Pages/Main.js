@@ -1,11 +1,11 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View, TouchableOpacity, StatusBar, Dimensions} from "react-native";
+import {AsyncStorage, Dimensions, StatusBar, StyleSheet, TouchableOpacity, View} from "react-native";
 import {DailyView} from "./Components/DailyView"
 import {TimeGrid} from "./Components/TimeGrid"
-import {Calendar, CalendarList,Agenda} from "react-native-calendars"
-import {Ionicons} from "@expo/vector-icons";
+import {Calendar} from "react-native-calendars"
+import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import {col} from './col';
-import Day from "react-native-calendars/src/calendar/day";
+import {LinearGradient} from "expo-linear-gradient";
 
 class Main extends React.Component {
     constructor(props) {
@@ -20,17 +20,20 @@ class Main extends React.Component {
             daysForView: [
             ],
             view:[
-            ]
+            ],
+            icon:[
+                <MaterialIcons key={"viewday"} name={"view-day"} size={32} color={"darkgray"}/>
+            ],
+            iconTheme:"",
+            selectedDay:"",
         }
     }
     async componentDidMount() {
-        let view = []
-        let lastDay = JSON.parse(await AsyncStorage.getItem("lastViewedDay"))
-        if(lastDay === null || lastDay === undefined) lastDay = new Date().toISOString().split('T')[0].replace("-", "").replace("-", "")
-        console.log("LAST DAY")
-        console.log(lastDay)
-        view.push(<DailyView key={0} day={lastDay}/>)
-
+        this.state.selectedDay = JSON.parse(await AsyncStorage.getItem("lastViewedDay"))
+        let iconTheme = await AsyncStorage.getItem("iconTheme")
+        if(iconTheme === null) iconTheme = "day"
+        this.setState({iconTheme})
+        let view = (this.state.iconTheme === "day")? this.renderDay(this.state.selectedDay):this.renderWeek(this.state.selectedDay)
         this.setState({view})
     }
 
@@ -52,21 +55,36 @@ class Main extends React.Component {
 
 
     }
-    changeDay(day) {
-        let daysForView = []
-        daysForView.push(day.dateString)
-        this.setState({daysForView})
+    renderDay(day) {
+        day = day.dateString
+        if(day === undefined) day = new Date(Date.now()).toISOString().split("T")[0]
+        let date = day.split("-")[0]+day.split("-")[1]+day.split("-")[2]
+        return [<DailyView key={date} day={date}/>]
+    }
+    renderWeek(day) {
+        let today = new Date(day.timestamp)
+        let week = []
+        for(let i=0;i<5;i++) {
 
+            week.push(new Date(today - ((today.getDay() - 1 - i) * 86400000)).toISOString().split("T")[0].replace("-","").replace("-",""))
+
+        }
+        console.log(week)
         let view = []
-
-        daysForView.forEach(day =>  {
-            let date = day.split("-")[0]+day.split("-")[1]+day.split("-")[2]
+        week.forEach(date => {
             view.push(<DailyView key={date} day={date}/>)
-            AsyncStorage.setItem("lastViewedDay",JSON.stringify(date))
         })
 
-        this.setState({view})
+        return view
+    }
+    changeDay(day) {
+        this.state.selectedDay = day
+        AsyncStorage.setItem("lastViewedDay",JSON.stringify(day))
         this.changeCalendarVisibility(false)
+
+        let view = (this.state.iconTheme === "day")? this.renderDay(day):this.renderWeek(day)
+        this.setState({view})
+
     }
     render() {
         return(
@@ -108,12 +126,50 @@ class Main extends React.Component {
                     </View>
 
                 </View>
+                <View style={styles.buttonTrayBottom}>
+                    <LinearGradient
+                        colors={["rgb(60,60,60)", "rgb(15,15,15)"]}
+                        start={[-0.66,0]}
+                        style={styles.buttonTrayBottom}>
+                    <TouchableOpacity onPress = {async () => {
+
+                        let icon = (this.state.iconTheme === "week")?
+                            [<MaterialIcons key={"viewday"} name={"view-day"} size={32} color={"darkgray"}/>]
+                            :
+                            [<MaterialIcons key={"viewweek"} name={"view-week"} size={32} color={"darkgray"}/>]
+
+
+                        this.setState({icon})
+                        this.state.iconTheme = (this.state.iconTheme === "day") ? "week" : "day"
+
+                        let view = (this.state.iconTheme === "day")? this.renderDay(this.state.selectedDay):this.renderWeek(this.state.selectedDay)
+                        this.setState({view})
+
+                        await AsyncStorage.setItem("iconTheme",(this.state.iconTheme === "day") ? "day" : "week")
+
+                    }} >
+
+                        {
+                            this.state.icon.map((key) => {
+                                return key
+                            }
+                        )}
+                    </TouchableOpacity>
+                    </LinearGradient>
+                </View>
             </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
+    buttonTrayBottom: {
+      position:"absolute",
+        right:10,
+        bottom:20,
+        padding:10,
+        borderRadius: 26,
+    },
     calendarLayer: {
         position: "absolute",
         zIndex: 99,

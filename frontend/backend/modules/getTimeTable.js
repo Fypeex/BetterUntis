@@ -27,38 +27,12 @@ exports.readTTFromFile = () => {
     return tt.tt
 }
 exports.getDayTimeTable = (day,session,school) => {
-    console.log("TimeTable")
-    console.log(`${school.serverUrl.split("?")[0]}/api/daytimetable/dayLesson?date=${day}&id=${session.personId}&type=${session.personType}`)
     return axios({
-        url:`https://terpsichore.webuntis.com/WebUntis/jsonrpc.do?school=RFGS-Freiburg`,
-        method:"post",
+        url:`${school.serverUrl.split("?")[0]}/api/daytimetable/dayLesson?date=${day}&id=${session.personId}&type=${session.personType}`,
+        method:"get",
         headers: {
             cookie: "JSESSIONID=" + session.sessionId
         },
-        data: {
-            "id":"ID",
-            "method":"getTimetable",
-            "params":{
-                "options":{
-                    "element":{
-                    "id":session.personId,
-                    "type":session.personType
-                    },
-                "startDate":day,
-                "endDate":day,
-                "onlyBaseTimetable":true,
-                "showBooking":true,
-                "showSubstText":true,
-                "showInfo":true,
-                "showLSText":true,
-                "teacherFields":["id", "name", "longname", "externalkey"],
-                "subjectFields":["id", "name", "longname", "externalkey"],
-                "roomFields":["id", "name", "longname", "externalkey"],
-                "klasseFields":["id", "name", "longname", "externalkey"]
-                }
-            },
-            "jsonrpc":"2.0"
-        }
     }).then(res => {
         return res
     }).catch(() => {

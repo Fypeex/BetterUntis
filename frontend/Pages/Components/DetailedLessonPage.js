@@ -10,13 +10,13 @@ export default class DetailedLessonPage extends Component {
         //AsyncStorage.removeItem("customHomework")
         this.state = {
             lessonInformation: {
-                class: this.props.info.kl,
-                teacher: this.props.info.te,
-                subject: this.props.info.su,
-                room: this.props.ro,
+                class: this.props.info.klasse,
+                teacher: this.props.info.teacher,
+                subject: this.props.info.subject,
+                room: this.props.rooom,
                 lessonDate: this.props.info.date,
+                id: this.props.info.lesson.id,
                 lessonDateFormatted: String(this.props.info.date).substr(6,2)+"/"+String(this.props.info.date).substr(4,2)+"/"+String(this.props.info.date).substr(0,4),
-                id: this.props.info.id,
             },
             customHomework: [],
             popup: [],
@@ -26,9 +26,10 @@ export default class DetailedLessonPage extends Component {
 
     async componentDidMount() {
         let UnrenderedHW = JSON.parse(await AsyncStorage.getItem("customHomework"))
+        if(UnrenderedHW === null) UnrenderedHW = []
         if(UnrenderedHW.find(element => element.id === this.state.lessonInformation.id) && UnrenderedHW.find(element => element.id === this.state.lessonInformation.id).hw) {
             UnrenderedHW.find(element => element.id === this.state.lessonInformation.id).hw.forEach(hw => {
-                this.newHomeworkComp(hw.id, hw.Homework)
+                this.newHomeworkComp(hw.id, hw.Homework,true)
             })
         }
     }
@@ -71,11 +72,11 @@ export default class DetailedLessonPage extends Component {
         await AsyncStorage.setItem("customHomework",JSON.stringify(UnrenderedHW))
         this.newHomeworkComp(id,text)
     }
-    newHomeworkComp(id,text) {
-        let customHomework = []
+    newHomeworkComp(id,text,rerender) {
+        let customHomework = (rerender)? this.state.customHomework:[]
 
         customHomework.push(
-            <TouchableOpacity style={styles.customHomework} onPress = {() => {
+            <TouchableOpacity key={id} style={styles.customHomework} onPress = {() => {
                 this.newRemovePopUp(id,text)
             }}>
                 <Text>{text}</Text>
@@ -86,7 +87,7 @@ export default class DetailedLessonPage extends Component {
     newHomeworkPopUp() {
         let popup = []
         popup.push(
-            <Dialog.Container visible={true} contentStyle={{backgroundColor:col.mainbg}}>
+            <Dialog.Container key={"POPUP"} visible={true} contentStyle={{backgroundColor:col.mainbg}}>
                 <Dialog.Title style={{color:"gray"}}>New Homework</Dialog.Title>
                 <Dialog.Input style={styles.button} onChangeText={(inputText) => {
                     this.setState({inputText})
@@ -121,7 +122,7 @@ export default class DetailedLessonPage extends Component {
     newRemovePopUp(id,text) {
         let popup = []
         popup.push(
-            <Dialog.Container visible={true} contentStyle={{backgroundColor:col.mainbg}}>
+            <Dialog.Container key={"POPUP"} visible={true} contentStyle={{backgroundColor:col.mainbg}}>
                 <Dialog.Title style={{color:"gray"}}>Edit Homework</Dialog.Title>
                 <Dialog.Input style={styles.button} onChangeText={(inputText) => {
                     this.setState({inputText})
@@ -131,7 +132,9 @@ export default class DetailedLessonPage extends Component {
                     this.setState({popup})
                 }}/>
                 <Dialog.Button label="Edit" onPress={async ()=>{
-                    await this.editHw(id,this.state.inputText)
+                    if(this.state.inputText !== "") {
+                        await this.editHw(id, this.state.inputText)
+                    }
                     let popup = []
                     this.setState({popup})
                 }}/>
@@ -161,16 +164,16 @@ export default class DetailedLessonPage extends Component {
         return (
             <View style={styles.container} key={2}>
                 <View style={styles.containerHeader} key={"Header"}>
-                    <Text style={styles.headerDate}>{new Date(this.state.lessonInformation.lessonDate).toString().split(" ")[0]} | {this.state.lessonInformation.lessonDateFormatted}</Text>
-                    <Text style={styles.headerStarttime}>{this.props.info.startTime}</Text>
-                    <Text style={styles.headerEndtime}>{this.props.info.endTime}</Text>
+                    <Text key={"HeaderDate"} style={styles.headerDate}>{new Date(this.state.lessonInformation.lessonDate).toString().split(" ")[0]} | {this.state.lessonInformation.lessonDateFormatted}</Text>
+                    <Text key={"HeaderStartTime"} style={styles.headerStarttime}>{this.props.info.startTime}</Text>
+                    <Text key={"HeaderEndTime"} style={styles.headerEndtime}>{this.props.info.endTime}</Text>
                 </View>
                 <View style={styles.lessonInfo}>
                     <Text>
-                        {this.state.lessonInformation.subject[0].longname}
+                        {this.state.lessonInformation.subject}
                     </Text>
                     <Text>
-                        {this.state.lessonInformation.teacher[0].longname}
+                        {this.state.lessonInformation.teacher}
                     </Text>
                 </View>
                 <View>
