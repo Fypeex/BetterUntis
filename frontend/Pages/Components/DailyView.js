@@ -1,13 +1,12 @@
 import {Text, TouchableOpacity, View, StyleSheet,Dimensions} from "react-native";
 import React,{Component} from "react";
-
+import InsetShadow from 'react-native-inset-shadow'
 import {col} from '../col';
 import Lesson from "./Lesson"
 import DetailedLessonPage from "./DetailedLessonPage"
 export class DailyView extends Component{
     constructor(props) {
         super(props);
-
         this.state = {
             days:[],
             lessons:[],
@@ -21,13 +20,16 @@ export class DailyView extends Component{
         let date = this.props.day
 
         let topDate = date
-        let botDate = date
-
+        let botDate = new Date(date.toString().substring(0,4) + "/" + date.toString().substring(4,6) + "/" + date.toString().substring(6,8)).toLocaleString().split(" ")[0]
         let days = []
         days.push(
             <TouchableOpacity style={styles.date} key={99}>
-                <Text style = {styles.topDate}>{topDate}</Text>
-                <Text style = {styles.bottomDate}>{botDate}</Text>
+                <Text style={styles.bottomDate}>{botDate}</Text>
+                <View style={{flexDirection:"row",justifyContent:"center",margin:-5}}>
+                    <Text style={styles.topDate}>{topDate.toString().substring(6,8)}</Text>
+                    <Text style={{color:"grey",fontSize:10}}>.{topDate.toString().substring(4,6)}</Text>
+                </View>
+
             </TouchableOpacity>
         )
 
@@ -119,26 +121,29 @@ export class DailyView extends Component{
                 renderedLessonsForThisLesson.forEach(lesson => {
                     innerKey++
                     lessonComponent.push(
-                        <TouchableOpacity style={[styles.lesson,{backgroundColor:lesson.data.backColor+"1f"}]} key={lesson + innerKey} onPress={() => {
-                            let touchedLesson = [
-                                <View style={[styles.touchedContainer,{left:(this.props.x + 1) * -60}]} key={"TouchedLesson"}>
-                                    <TouchableOpacity
-                                        style={[styles.touchedContainer, {left: 0}]}
-                                        onPress={() => {
-                                            let touchedLesson = []
-                                            this.setState({touchedLesson})
-                                        }}
-                                        key = {0}
-                                    />
-                                    <View style={styles.touchedLesson} key={1}>
-                                        <DetailedLessonPage info={lesson.data}/>
+
+                            <TouchableOpacity style={[styles.lesson,{backgroundColor:lesson.data.backColor+"1f"}]} key={lesson + innerKey} onPress={() => {
+                                let touchedLesson = [
+                                    <View style={[styles.touchedContainer,{left:(this.props.x + 1) * -60}]} key={"TouchedLesson"}>
+                                        <TouchableOpacity
+                                            style={[styles.touchedContainer, {left: 0}]}
+                                            onPress={() => {
+                                                let touchedLesson = []
+                                                this.setState({touchedLesson})
+                                            }}
+                                            key = {0}
+                                        />
+                                        <View style={styles.touchedLesson} key={1}>
+                                            <DetailedLessonPage info={lesson.data} header={lesson.data.backColor}/>
+                                        </View>
                                     </View>
+                                ]
+                                this.setState({touchedLesson})
+                            }}>
+                                <View style={{flex:1,padding:1.5,paddingBottom:3,paddingRight:3}}>
+                                    <Lesson info={lesson.data}/>
                                 </View>
-                            ]
-                            this.setState({touchedLesson})
-                        }}>
-                            <Lesson info={lesson.data}/>
-                        </TouchableOpacity>
+                            </TouchableOpacity>
                     )
                 })
                 key++
@@ -221,14 +226,14 @@ const styles = StyleSheet.create({
     touchedLesson: {
         position: "absolute",
         left:60,
-        zIndex : 10,
+        zIndex : 50,
         width:250,
         height: 450,
     },
     lesson: {
         flexDirection:"row",
         borderRadius:10,
-        margin:3,
+        margin:1,
         flex:1,
         
     },
@@ -244,19 +249,20 @@ const styles = StyleSheet.create({
         flex:6/6,
     },
     date:{
+        borderRightWidth:0.167,
         flex:1,
-        borderTopRightRadius:6,
+        borderColor:col.grey,
+        justifyContent: "flex-start"
     },
     topDate: {
         color: col.white,
         textAlign: "center",
-        fontSize:13,
+        fontSize:22,
         alignItems: "center",
         borderRadius:3,
-        margin:3,
     },
     bottomDate:{
-        color: col.white,
+        color: "grey",
         textAlign: "center",
         fontSize:10,
         alignItems: "center",

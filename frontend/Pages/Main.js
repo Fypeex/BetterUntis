@@ -50,15 +50,7 @@ class Main extends React.Component {
             </LinearGradient>
         ]
         this.setState({popup})
-        Animated.timing(
-            this.state.spinValue,
-            {
-                toValue: 1,
-                duration: 3000,
-                easing: Easing.linear,
-                useNativeDriver: true
-            }
-        ).start();
+
         this.state.selectedDay = JSON.parse(await AsyncStorage.getItem("lastViewedDay"))
         let iconTheme = await AsyncStorage.getItem("iconTheme")
         if(iconTheme === null) iconTheme = "day"
@@ -157,14 +149,21 @@ class Main extends React.Component {
     }
     async switchIcon() {
         let icon = (this.state.iconTheme === "week")?
-            [<MaterialIcons key={"viewday"} name={"view-day"} size={32} color={"darkgray"}/>]
-            :
             [<MaterialIcons key={"viewweek"} name={"view-week"} size={32} color={"darkgray"}/>]
-
-
+            :
+            [<MaterialIcons key={"viewday"} name={"view-day"} size={32} color={"darkgray"}/>]
         this.setState({icon})
     }
     render() {
+        Animated.timing(
+            this.state.spinValue,
+            {
+                toValue: 1,
+                duration: 3000,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
         return(
             <View style={styles.container}>
                 <StatusBar hidden={true}/>
@@ -216,12 +215,11 @@ class Main extends React.Component {
                         style={styles.buttonTrayBottom}>
                     <TouchableOpacity onPress = {async () => {
 
-                        await this.switchIcon()
-                        this.state.iconTheme = (this.state.iconTheme === "day") ? "week" : "day"
 
+                        this.state.iconTheme = (this.state.iconTheme === "day") ? "week" : "day"
                         let view = (this.state.iconTheme === "day")? await this.renderDay(this.state.selectedDay):await this.renderWeek(this.state.selectedDay)
                         this.setState({view})
-
+                        await this.switchIcon()
                         await AsyncStorage.setItem("iconTheme",(this.state.iconTheme === "day") ? "day" : "week")
 
                     }} >
@@ -264,7 +262,7 @@ const styles = StyleSheet.create({
     },
     spinner:{
         position:"absolute",
-        left: "40%",
+        left: "27%",
         top: "40%",
         padding:15,
         borderRadius:25,

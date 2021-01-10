@@ -24,12 +24,28 @@ export default class DetailedLessonPage extends Component {
     }
 
     async componentDidMount() {
+        if(this.props.info.homeWorks !== null) {
+            this.props.info.homeWorks.forEach(hw => {
+
+                //this.newHomework()
+                //this.newHomeworkComp()
+
+            })
+        }
         let UnrenderedHW = JSON.parse(await AsyncStorage.getItem("customHomework"))
         if(UnrenderedHW === null) UnrenderedHW = []
         if(UnrenderedHW.find(element => element.id === this.state.lessonInformation.id) && UnrenderedHW.find(element => element.id === this.state.lessonInformation.id).hw) {
             UnrenderedHW.find(element => element.id === this.state.lessonInformation.id).hw.forEach(hw => {
-                this.newHomeworkComp(hw.id, hw.Homework,true)
+                this.newHomeworkComp(hw.id, hw.Homework,false)
             })
+        }
+    }
+    renderTime(input){
+        switch (input.length) {
+            case 3:
+                return input.substring(0, 1) + ":" + input.substring(1)
+            case 4:
+                return input.substring(0, 2) + ":" + input.substring(2)
         }
     }
     async newHomework(id,text) {
@@ -69,7 +85,7 @@ export default class DetailedLessonPage extends Component {
         }
 
         await AsyncStorage.setItem("customHomework",JSON.stringify(UnrenderedHW))
-        this.newHomeworkComp(id,text)
+        this.newHomeworkComp(id,text,false)
     }
     newHomeworkComp(id,text,rerender) {
         let customHomework = (rerender)? this.state.customHomework:[]
@@ -148,11 +164,15 @@ export default class DetailedLessonPage extends Component {
 
 
     async editHw(id,text) {
+        console.log("EDITING HW")
+        console.log(id)
+        console.log(text)
 
-
-        let storedHW = JSON.parse(await AsyncStorage.getItem("customHomework"))
-        storedHW.find(hw => hw.id === this.state.lessonInformation.id).hw[storedHW.find(hw => hw.id === this.state.lessonInformation.id).hw.findIndex(element => element.id === id)].Homework = text
-        await AsyncStorage.setItem("customHomework",JSON.stringify(storedHW))
+        let customHomework = JSON.parse(await AsyncStorage.getItem("customHomework"))
+        if(customHomework === null) return
+        console.log(customHomework)
+        customHomework.find(hw => hw.id === this.state.lessonInformation.id).hw[customHomework.find(hw => hw.id === this.state.lessonInformation.id).hw.findIndex(element => element.id === id)].Homework = text
+        await AsyncStorage.setItem("customHomework",JSON.stringify(customHomework))
 
         await this.componentDidMount()
 
@@ -161,20 +181,26 @@ export default class DetailedLessonPage extends Component {
     render() {
         return (
             <View style={styles.container} key={2}>
-                <View style={styles.containerHeader} key={"Header"}>
+                <View style={[styles.containerHeader,{backgroundColor:this.props.header + "8f"}]} key={"Header"}>
                     <Text key={"HeaderDate"} style={styles.headerDate}>{new Date(this.state.lessonInformation.lessonDate).toString().split(" ")[0]} | {this.state.lessonInformation.lessonDateFormatted}</Text>
                     <View style={styles.headerTimeContainer} key={"HeaderTime"}>
-                        <Text key={"HeaderStartTime"} style={styles.headerStarttime}>{this.props.info.startTime}</Text>
+                        <Text key={"HeaderStartTime"} style={styles.headerStarttime}>{this.renderTime(this.props.info.startTime.toString())}</Text>
                         <Text key={"HeaderConnector"} style={styles.headerConnector}>-</Text>
-                        <Text key={"HeaderEndTime"} style={styles.headerEndtime}>{this.props.info.endTime}</Text>
+                        <Text key={"HeaderEndTime"} style={styles.headerEndtime}>{this.renderTime(this.props.info.endTime.toString())}</Text>
                     </View>
                 </View>
-                <View style={styles.lessonInfo}>
-                    <Text style={styles.detailedSubject}>
+                <View style={styles.lessonInfo} key={"info"}>
+                    <Text style={styles.detailedSubject} key={"s"}>
                         {"Subject: " + this.state.lessonInformation.subject}
                     </Text>
-                    <Text style={styles.detailedTeacher}>
+                    <Text style={styles.detailedTeacher} key={"t"}>
                         {"Teacher: " + this.state.lessonInformation.teacher}
+                    </Text>
+                    <Text style={styles.detailedTeacher} key={"r"}>
+                        {"Room: " + this.props.info.periods[0].rooms[0].longName}
+                    </Text>
+                    <Text style={styles.detailedTeacher} key={"i"}>
+                        {"Info: " + this.props.info.info}
                     </Text>
                 </View>
                 <View>
@@ -232,7 +258,6 @@ const styles = StyleSheet.create({
         borderTopLeftRadius:10,
         borderTopRightRadius:10,
         flex:0.2,
-        backgroundColor: col.headerCol,
         justifyContent: "center",
         alignItems: "center",
     },

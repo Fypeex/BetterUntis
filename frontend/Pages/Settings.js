@@ -20,14 +20,6 @@ class Settings extends React.Component {
                         <Ionicons name="md-options" style={styles.icon} size={32}/>
                     </TouchableOpacity>
                 </View>
-                <View>
-                    <Text>General</Text>
-                    <View>
-                        <View>
-
-                        </View>
-                    </View>
-                </View>
             </View>
         )
     }

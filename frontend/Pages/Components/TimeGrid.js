@@ -12,6 +12,14 @@ export class TimeGrid extends React.Component {
             calendarVisible:false
         }
     }
+    renderTime(input){
+        switch (input.length) {
+            case 3:
+                return input.substring(0, 1) + ":" + input.substring(1)
+            case 4:
+                return input.substring(0, 2) + ":" + input.substring(2)
+        }
+    }
     renderTimeGrid(TimeGrid) {
         let rows = TimeGrid.data.rows
         let endTime = 755;
@@ -19,11 +27,13 @@ export class TimeGrid extends React.Component {
 
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].startTime === endTime) {
+                let start = this.renderTime(rows[i].startTime.toString())
+                let end = this.renderTime(rows[i].endTime.toString())
                 timeGridLeft.push(
                     <View style={styles.timeGridBlock} key={endTime}>
-                        <Text key={0} style={[styles.startTime,styles.text]}> {rows[i].startTime}</Text>
+                        <Text key={0} style={[styles.startTime,styles.text]}> {start}</Text>
                         <Text key={1} style={[styles.periodNumber,styles.text]}> {rows[i].period}</Text>
-                        <Text key={2} style={[styles.endTime,styles.text]}> {rows[i].endTime}</Text>
+                        <Text key={2} style={[styles.endTime,styles.text]}> {end}</Text>
                     </View>
                 )
                 endTime = rows[i].endTime
@@ -39,8 +49,6 @@ export class TimeGrid extends React.Component {
         return timeGridLeft
     }
     async componentDidMount() {
-
-        let nav = this.props.navigation
 
         let school = await getSchool()
         if(school=== null) {
