@@ -6,6 +6,7 @@ A better version of the Mobile Webuntis App, developed for Students only
 
 Download the APK File here:
 https://drive.google.com/file/d/1PHMwuN6-naCekOJhhr1mqvXDdSBRdMc_/view?usp=sharing
+
 ###Current Versions
 ```
 1.0.0 - Basic APP without any Features
