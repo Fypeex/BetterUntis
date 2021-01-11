@@ -1,6 +1,6 @@
 import React from "react"
-import {AsyncStorage, StyleSheet, Text, View,TouchableOpacity} from "react-native";
-import {getSchool,getSession,getNewSession,getGrid} from "../StorageHandler"
+import {StyleSheet, Text, View} from "react-native";
+import {getSchool,getSession,getGrid} from "../StorageHandler"
 import {col} from '../col';
 
 export class TimeGrid extends React.Component {

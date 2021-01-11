@@ -1,6 +1,5 @@
-import {Text, TouchableOpacity, View, StyleSheet,Dimensions} from "react-native";
+import {Text, TouchableOpacity, View, StyleSheet, Dimensions} from "react-native";
 import React,{Component} from "react";
-import InsetShadow from 'react-native-inset-shadow'
 import {col} from '../col';
 import Lesson from "./Lesson"
 import DetailedLessonPage from "./DetailedLessonPage"
@@ -122,12 +121,12 @@ export class DailyView extends Component{
                     innerKey++
                     lessonComponent.push(
 
-                            <TouchableOpacity style={[styles.lesson,{backgroundColor:lesson.data.backColor+"1f"}]} key={lesson + innerKey} onPress={() => {
+                            <TouchableOpacity style={[styles.lesson,{backgroundColor:lesson.data.backColor+"1f"}]} key={lesson + innerKey} onPress={async () => {
                                 let touchedLesson = [
                                     <View style={[styles.touchedContainer,{left:(this.props.x + 1) * -60}]} key={"TouchedLesson"}>
                                         <TouchableOpacity
                                             style={[styles.touchedContainer, {left: 0}]}
-                                            onPress={() => {
+                                            onPress={async () => {
                                                 let touchedLesson = []
                                                 this.setState({touchedLesson})
                                             }}
@@ -179,7 +178,6 @@ export class DailyView extends Component{
 
         }
     }
-
 
     async componentDidMount() {
         await this.renderDays()

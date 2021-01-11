@@ -24,6 +24,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
+
+      "package": "BetterUntis.com"
     },
     "web": {
       "favicon": "./assets/favicon.png"

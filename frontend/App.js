@@ -1,6 +1,5 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {StyleSheet} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import SchoolSearch from "./Pages/SchoolSearch"
@@ -38,7 +37,6 @@ class App extends React.Component {
                             name="DrawerNav"
                             options={{headerShown: false}}
                             component={DrawerNav}
-
                         />
                         </Stack.Navigator>
                     </NavigationContainer>
@@ -60,6 +58,11 @@ function DrawerNav() {
                     name="Settings"
                     options={{headerShown: false}}
                     component={Settings}
+                />
+                <Drawer.Screen
+                    name="LoginScreen"
+                    options={{headerShown: false}}
+                    component={LoginScreen}
                 />
             </Drawer.Navigator>
     );

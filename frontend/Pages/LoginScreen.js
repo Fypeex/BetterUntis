@@ -24,8 +24,11 @@ class LoginScreen extends React.Component {
             };
         }
     async componentDidMount() {
+        await AsyncStorage.setItem("State","LOGGED_OUT")
+        await AsyncStorage.removeItem("Creds")
         let data = [];
         const value = JSON.parse(await AsyncStorage.getItem('School'));
+        console.log(value)
         if (value !== null) {
             data.push([
                 <View key={0}><Text style={styles.infoTop} >{value.displayName}</Text></View>,
@@ -34,21 +37,41 @@ class LoginScreen extends React.Component {
         }
         this.setState({data})
     }
+    invalid(text) {
+        let valid = [
+            <View style={styles.invalidIn} key={"invalid"}>
+                <Text style={styles.invalidText}>{text}</Text>
+            </View>
+        ]
+        this.setState({valid})
+
+        setTimeout(() => {
+            let valid = []
+            this.setState({valid})
+        },1500)
+    }
     login = async () => {
 
-        if(this.state.username !== "" || this.state.password !== "") {
-
-            const value = JSON.parse(await AsyncStorage.getItem("School"));
-            l.login(value.serverUrl, this.state.username, this.state.password).then(async r => {
-
-                if(!r.error) {
-                    await AsyncStorage.setItem("Session", JSON.stringify(r.data.result))
-                    await AsyncStorage.setItem("Creds", JSON.stringify({username: this.state.username, password: this.state.password}))
-                    await AsyncStorage.setItem("State","LOGGED_IN")
-                    this.props.navigation.navigate("DrawerNav",{screen:"Main"})
-                }
-            })
+        if(this.state.username === "") {
+            this.invalid("Please type in a username")
+            return
         }
+        if(this.state.password === "") {
+            this.invalid("Please type in a password")
+            return
+        }
+
+        const value = JSON.parse(await AsyncStorage.getItem("School"));
+        l.login(value.serverUrl, this.state.username, this.state.password).then(async r => {
+            if(!r.data.error) {
+                await AsyncStorage.setItem("Session", JSON.stringify(r.data.result))
+                await AsyncStorage.setItem("Creds", JSON.stringify({username: this.state.username, password: this.state.password}))
+                await AsyncStorage.setItem("State","LOGGED_IN")
+                this.props.navigation.navigate("DrawerNav",{screen:"Main"})
+            }else {
+                this.invalid("Wrong username or Password")
+            }
+        })
     }
     render(){
        return (
@@ -78,8 +101,8 @@ class LoginScreen extends React.Component {
                         <TextInput style={styles.username} placeholderTextColor = "rgb(150,150,150)" placeholder = "Username" onChangeText = {(text) => this.setState({username: text})}/>
                         <TextInput style={styles.password} secureTextEntry={true} placeholderTextColor = "rgb(150,150,150)" placeholder = "Password" onChangeText = {(password) => this.setState({password: password})}/>
                         {
-                        this.state.valid.map((value) => {
-                            return value
+                        this.state.valid.map((key) => {
+                            return key
                         })
                     }
                         <LinearGradient  //Login Button + Gradient

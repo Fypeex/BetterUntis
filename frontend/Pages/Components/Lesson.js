@@ -1,5 +1,5 @@
 import React,{Component} from "react";
-import {View,Text,StyleSheet,TouchableOpacity,Dimensions} from "react-native"
+import {View,Text,StyleSheet} from "react-native"
 import {col} from "../col";
 export default class Lesson extends Component {
     constructor(props) {

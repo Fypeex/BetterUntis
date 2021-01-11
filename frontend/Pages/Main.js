@@ -9,8 +9,10 @@ import {LinearGradient} from "expo-linear-gradient";
 import {getDayTimeTable} from "../backend/modules/getTimeTable";
 import {getGrid, getNewSession, getSchool, getSession} from "./StorageHandler";
 
+
 class Main extends React.Component {
     constructor(props) {
+        //AsyncStorage.clear()
         super(props);
         this.state = {
             calendar: [
@@ -32,7 +34,17 @@ class Main extends React.Component {
             popupshown:false,
             iconTheme:"",
             selectedDay:"",
+            gesture:true
         }
+        this.animation = Animated.timing(
+            this.state.spinValue,
+            {
+                toValue: 1,
+                duration: 24000,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        )
     }
     async componentDidMount() {
         let popup = [
@@ -43,14 +55,14 @@ class Main extends React.Component {
                 key={"gradient"}>
                 <Animated.View style={{transform:[{rotate:this.state.spinValue.interpolate({
                             inputRange: [0, 1],
-                            outputRange: ['0deg', '360deg']
+                            outputRange: ['0deg', '2880deg']
                         })}]}}>
                     <FontAwesome color={"white"} key={"spinner"} name={"spinner"} size={50} contentStyle={{backgroundColor: "rgba(1,1,1,0)"}}/>
                 </Animated.View>
             </LinearGradient>
         ]
         this.setState({popup})
-
+        this.animation.start()
         this.state.selectedDay = JSON.parse(await AsyncStorage.getItem("lastViewedDay"))
         let iconTheme = await AsyncStorage.getItem("iconTheme")
         if(iconTheme === null) iconTheme = "day"
@@ -108,18 +120,19 @@ class Main extends React.Component {
     }
     async renderDay(day) {
         this.setState({popupshown:true})
-
-        day = day.dateString
-        if(day === undefined) day = new Date(Date.now()).toISOString().split("T")[0]
-        let date = day.split("-")[0]+day.split("-")[1]+day.split("-")[2]
+        this.animation.start()
+        let today = (day)? new Date(day.timestamp):new Date(Date.now())
+        let date = new Date(today).toISOString().split("T")[0].replace("-","").replace("-","")
         let data = await this.getTimeTable(date)
         if(!data) return []
         this.setState({popupshown:false})
+        this.animation.stop()
         return [<DailyView key={date} day={date} timeTable={data[1]} grid={data[0]} x={0} />]
     }
     async renderWeek(day) {
         this.setState({popupshown:true})
-        let today = new Date(day.timestamp)
+        this.animation.start()
+        let today = (day)? new Date(day.timestamp):new Date(Date.now())
         let week = []
         for(let i=0;i<5;i++) {
 
@@ -136,6 +149,7 @@ class Main extends React.Component {
             x++
         }
         this.setState({popupshown:false})
+        this.animation.stop()
         return view
     }
     async changeDay(day) {
@@ -155,15 +169,9 @@ class Main extends React.Component {
         this.setState({icon})
     }
     render() {
-        Animated.timing(
-            this.state.spinValue,
-            {
-                toValue: 1,
-                duration: 3000,
-                easing: Easing.linear,
-                useNativeDriver: true
-            }
-        ).start();
+        let touchstartX = 0;
+        let touchendX = 0;
+
         return(
             <View style={styles.container}>
                 <StatusBar hidden={true}/>
@@ -185,6 +193,7 @@ class Main extends React.Component {
                         return key
                     })
                 }
+
                 <View style={styles.ttContainer}>
                     <View style={styles.LeftBar} key={0}>
                         <TouchableOpacity style={styles.timeGridBlock}  key={65} onPress={() => {
@@ -194,7 +203,31 @@ class Main extends React.Component {
                         </TouchableOpacity>
                         <TimeGrid/>
                     </View>
-                    <View style={styles.smallTTContainer} key={1}>
+                    <View style={styles.smallTTContainer} key={1} onTouchStart={(event) => {
+                        touchstartX = event.nativeEvent.pageX;
+                    }}
+                          onTouchEnd={async (event) => {
+                              touchendX = event.nativeEvent.pageX;
+                              if(this.state.gesture) {
+                                  if (touchendX < touchstartX && touchstartX - touchendX > 50) {
+                                      let amount = (this.state.iconTheme === "day") ? 1 : 7
+                                      let day = {
+                                          dateString: undefined,
+                                          timestamp: (this.state.selectedDay !== null)? this.state.selectedDay.timestamp + amount * 86400000:Date.now() + amount * 86400000
+                                      }
+                                      await this.changeDay(day)
+                                  } else if (touchendX > touchstartX && touchendX - touchstartX > 50) {
+                                      let amount = (this.state.iconTheme === "day") ? 1 : 7
+                                      let day = {
+                                          dateString: undefined,
+                                          timestamp: (this.state.selectedDay !== null)? this.state.selectedDay.timestamp - amount * 86400000:Date.now() - amount * 86400000
+                                      }
+                                      await this.changeDay(day)
+                                  }
+                              }
+                          }}>
+
+
                         {
                             this.state.view.map((key) => {
                                 return key
@@ -282,7 +315,7 @@ const styles = StyleSheet.create({
     },
     icon: {
         paddingTop:15,
-        paddingLeft:20,
+        paddingLeft:13,
         color: col.white,
     },
     ttContainer: {

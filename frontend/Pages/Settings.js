@@ -1,5 +1,5 @@
 import React from "react"
-import {StyleSheet, Text, TouchableOpacity, View,Switch} from "react-native";
+import {StyleSheet, TouchableOpacity, View} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
 
 class Settings extends React.Component {
