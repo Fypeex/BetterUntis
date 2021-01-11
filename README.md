@@ -9,7 +9,7 @@ https://drive.google.com/file/d/1PHMwuN6-naCekOJhhr1mqvXDdSBRdMc_/view?usp=shari
 
 ### Current Versions
 ```
-1.0.0 - Basic APP without any Features
+1.0.0 - Basic App without any Features
 ```
 ### Background
 
