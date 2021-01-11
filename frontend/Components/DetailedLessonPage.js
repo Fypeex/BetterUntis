@@ -1,7 +1,7 @@
 import React,{Component} from "react";
 import {View,Text,StyleSheet,TouchableOpacity,TextInput,AsyncStorage} from "react-native"
-import {col} from "../col"
-import Ionicons from "react-native-vector-icons/Ionicons";
+import {col} from "../Pages/col"
+import { Ionicons } from '@expo/vector-icons';
 import Dialog from "react-native-dialog";
 export default class DetailedLessonPage extends Component {
     constructor(props) {

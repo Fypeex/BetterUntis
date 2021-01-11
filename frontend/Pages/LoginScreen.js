@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
-const l = require("../backend/modules/accountHandling")
+const l = require("../../backend/modules/accountHandling")
 
 class LoginScreen extends React.Component {
     constructor(props){

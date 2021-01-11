@@ -1,6 +1,6 @@
 import {AsyncStorage} from "react-native";
-import {login} from "../backend/modules/accountHandling";
-import {getTimeGrid} from "../backend/modules/getTimeTable";
+import {login} from "../../backend/modules/accountHandling";
+import {getTimeGrid} from "../../backend/modules/getTimeTable";
 async function getCreds() {
     let creds = JSON.parse(await AsyncStorage.getItem("Creds"))
     if(creds === undefined) {

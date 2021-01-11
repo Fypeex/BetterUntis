@@ -1,6 +1,6 @@
 import {Text, TouchableOpacity, View, StyleSheet, Dimensions} from "react-native";
 import React,{Component} from "react";
-import {col} from '../col';
+import {col} from '../Pages/col';
 import Lesson from "./Lesson"
 import DetailedLessonPage from "./DetailedLessonPage"
 export class DailyView extends Component{

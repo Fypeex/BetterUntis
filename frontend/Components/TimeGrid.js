@@ -1,7 +1,7 @@
 import React from "react"
 import {StyleSheet, Text, View} from "react-native";
-import {getSchool,getSession,getGrid} from "../StorageHandler"
-import {col} from '../col';
+import {getSchool,getSession,getGrid} from "../Pages/StorageHandler"
+import {col} from '../Pages/col';
 
 export class TimeGrid extends React.Component {
     constructor(props) {

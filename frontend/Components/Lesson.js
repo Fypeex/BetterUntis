@@ -1,6 +1,6 @@
 import React,{Component} from "react";
 import {View,Text,StyleSheet} from "react-native"
-import {col} from "../col";
+import {col} from "../Pages/col";
 export default class Lesson extends Component {
     constructor(props) {
         super(props);

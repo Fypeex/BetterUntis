@@ -1,12 +1,12 @@
 import React from "react"
 import {AsyncStorage, Dimensions, StatusBar, StyleSheet, TouchableOpacity, View,Animated,Easing} from "react-native";
-import {DailyView} from "./Components/DailyView"
-import {TimeGrid} from "./Components/TimeGrid"
+import {DailyView} from "../Components/DailyView"
+import {TimeGrid} from "../Components/TimeGrid"
 import {Calendar} from "react-native-calendars"
 import {Ionicons, MaterialIcons,FontAwesome} from "@expo/vector-icons";
 import {col} from './col';
 import {LinearGradient} from "expo-linear-gradient";
-import {getDayTimeTable} from "../backend/modules/getTimeTable";
+import {getDayTimeTable} from "../../backend/modules/getTimeTable";
 import {getGrid, getNewSession, getSchool, getSession} from "./StorageHandler";
 
 

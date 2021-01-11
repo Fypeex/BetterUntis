@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
-const ss = require("../backend/modules/schoolSearch")
-const l = require("../backend/modules/accountHandling")
+const ss = require("../../backend/modules/schoolSearch")
+const l = require("../../backend/modules/accountHandling")
 
 class SchoolSearch extends React.Component {
     constructor(props) {
